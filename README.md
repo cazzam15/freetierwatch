@@ -8,3 +8,5 @@ Independent tracker of AI app builder free plans and prices in GBP. Edit `data.j
 - Bolt.new: status disputed; check Bolt help centre
 - v0: via Dub, by application
 - Replit: credits only, replit.com/refer
+
+Live at https://freetierwatch.co.uk/

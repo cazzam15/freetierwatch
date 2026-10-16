@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://cazzam15.github.io/freetierwatch/sitemap.xml

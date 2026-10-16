@@ -1,0 +1,32 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FreeTierWatch – AI app builder free plans & prices in £</title>
+<meta name="description" content="Independent, dated tracker of free plans and cheapest paid plans for AI app builders like Lovable, Bolt, v0, Replit and Cursor, with prices in GBP.">
+<link rel="canonical" href="https://cazzam15.github.io/freetierwatch/">
+<meta property="og:title" content="FreeTierWatch – AI builder free plans in £"><meta property="og:description" content="What every AI app builder gives you free today, and what it costs in pounds. Checked and dated.">
+<meta property="og:type" content="website"><meta property="og:url" content="https://cazzam15.github.io/freetierwatch/"><meta name="twitter:card" content="summary">
+<style>
+body{font-family:system-ui,sans-serif;margin:0;color:#1a1a1a;background:#fafafa;line-height:1.5}
+header,main,footer{max-width:960px;margin:auto;padding:1rem}header{padding-top:2rem}h1{margin:0}.sub{color:#555}
+.wrap{overflow-x:auto;background:#fff;border:1px solid #ddd;border-radius:8px}table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{padding:.6rem;text-align:left;border-bottom:1px solid #eee;vertical-align:top}th{cursor:pointer;background:#f0f4ff;white-space:nowrap}
+th:after{content:" ↕";color:#999}.note{color:#666;font-size:.8rem}.unclear{color:#b45309;font-weight:600}a{color:#1d4ed8}
+section{margin:2rem 0}.box{background:#fff;border:1px solid #ddd;border-radius:8px;padding:1rem}
+@media(max-width:600px){td,th{padding:.4rem;font-size:.85rem}}
+</style></head><body>
+<header><h1>FreeTierWatch</h1><p class="sub">What AI app builders give you for free today, and what the cheapest paid plan costs in £. Every row checked and dated.</p></header>
+<main>
+<div class="wrap"><table id="t"><thead><tr><th data-k="tool">Tool</th><th data-k="free">Free plan</th><th data-k="paid_gbp">Cheapest paid (£/mo)</th><th data-k="paid_usd">US$</th><th data-k="checked">Last checked</th></tr></thead><tbody></tbody></table></div>
+<p class="note" id="fx"></p>
+<section><h2>Changelog</h2><ul id="log"></ul></section>
+<section class="box"><h2>Newsletter</h2><p>A short weekly email when a free plan or price changes. <strong>Coming soon.</strong></p></section>
+<section><h2>About</h2><p>FreeTierWatch is an independent site run by Caroline (<a href="https://x.com/CaroBuildsUK">@CaroBuildsUK</a>), a non-developer learning to build with AI in the UK. It isn't affiliated with any of the tools listed. Some links may be affiliate links: if you sign up through one, I may earn a commission at no extra cost to you. That never changes what's in the table. Prices change often, so check the official page (linked in each row) before you pay. Spotted something out of date? Tell me on X.</p></section>
+</main><footer class="note">© 2026 FreeTierWatch</footer>
+<script>
+let D,k="tool",asc=true;const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function draw(){const r=[...D.tools].sort((a,b)=>{let x=a[k],y=b[k];if(x==null)return 1;if(y==null)return -1;return (typeof x=="number"?x-y:String(x).localeCompare(y))*(asc?1:-1)});
+document.querySelector("tbody").innerHTML=r.map(t=>`<tr><td><a href="${esc(t.url)}" rel="nofollow noopener" target="_blank">${esc(t.tool)}</a></td><td>${t.free=="unclear"?'<span class="unclear">Unclear</span>':esc(t.free)}${t.note?`<div class="note">${esc(t.note)}</div>`:""}</td><td>£${t.paid_gbp.toFixed(2)}<div class="note">${esc(t.paid_plan)}</div></td><td>$${t.paid_usd}</td><td>${esc(t.checked)}<div class="note"><a href="${esc(t.source)}" target="_blank" rel="noopener">source</a></div></td></tr>`).join("")}
+fetch("data.json").then(r=>r.json()).then(d=>{D=d;draw();
+document.getElementById("fx").innerHTML=`£ prices converted at 1 USD = ${d.fx.usd_gbp} GBP (mid-market, ${d.fx.date}, <a href="${esc(d.fx.source)}">source</a>). Prices exclude VAT unless stated.`;
+document.getElementById("log").innerHTML=d.changelog.map(c=>`<li><strong>${esc(c.date)}</strong> · ${esc(c.tool)}: ${esc(c.change)} ${c.source?`<a href="${esc(c.source)}">source</a>`:""}</li>`).join("")});
+document.querySelectorAll("th").forEach(h=>h.onclick=()=>{asc=k==h.dataset.k?!asc:true;k=h.dataset.k;draw()});
+</script></body></html>

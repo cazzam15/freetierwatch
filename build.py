@@ -77,6 +77,7 @@ for t in T:
 <section class="box"><h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>
 {BEEHIIV}</section></main>
 <footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with {E(t["tool"])}.<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch</footer>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
 '''
     os.makedirs(s,exist_ok=True); open(f"{s}/index.html","w").write(page)

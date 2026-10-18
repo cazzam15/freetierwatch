@@ -36,4 +36,5 @@ fetch("data.json").then(r=>r.json()).then(d=>{D=d;draw();
 document.getElementById("fx").innerHTML=`£ prices converted at 1 USD = ${d.fx.usd_gbp} GBP (mid-market, ${d.fx.date}, <a href="${esc(d.fx.source)}">source</a>). Prices exclude VAT unless stated.`;
 document.getElementById("log").innerHTML=d.changelog.map(c=>`<li><strong>${esc(c.date)}</strong> · ${esc(c.tool)}: ${esc(c.change)} ${c.source?`<a href="${esc(c.source)}">source</a>`:""}</li>`).join("")});
 document.querySelectorAll("th").forEach(h=>h.onclick=()=>{asc=k==h.dataset.k?!asc:true;k=h.dataset.k;draw()});
-</script></body></html>
+</script><!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f608d8c7c07c493081b69d69a6787c76"}'></script><!-- End Cloudflare Web Analytics -->
+</body></html>

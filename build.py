@@ -8,6 +8,11 @@ SITE="https://freetierwatch.co.uk"
 def slug(n): return re.sub(r"[^a-z0-9]+","-",n.lower()).strip("-")
 def month(d):
     import datetime; return datetime.date.fromisoformat(d).strftime("%b %Y")
+# Slack community invite link: set SLACK_URL below to the real invite link, then run python3 build.py (updates homepage + every tool page)
+SLACK_URL="https://join.slack.com/t/freetierwatch/shared_invite/zt-4d77sa07r-CooNgl_Mz9D2nqJ7LMoqKg"  # <- the only place to change
+SLACK_TEXT="Join the free FreeTierWatch Slack community"
+SLACK_P=f'<!--slack--><p class="slack"><a href="{SLACK_URL}" target="_blank" rel="noopener">{SLACK_TEXT}</a></p><!--/slack-->'
+SLACK_SPAN=f'<!--slack--><span class="slack"><a href="{SLACK_URL}" target="_blank" rel="noopener">{SLACK_TEXT}</a></span><!--/slack-->'
 BEEHIIV='<script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="9023118a-54b2-4146-827a-5ed26d0013e0"></script>'
 def free_txt(t): return "Unclear (not shown on the pricing page when checked)" if t["free"]=="unclear" else t["free"]
 def row(t):
@@ -44,12 +49,15 @@ h=open("index.html").read()
 def between(h,a,b,new):
     i=h.index(a)+len(a); j=h.index(b,i); return h[:i]+new+h[j:]
 h=re.sub(r'<meta name="twitter:card" content="summary">','',h)
-h=re.sub(r'<!--og-->.*?<!--/og-->','',h,flags=re.S); h=re.sub(r'<!--ld-->.*?<!--/ld-->','',h,flags=re.S)
+h=re.sub(r'<!--og-->.*?<!--/og-->','',h,flags=re.S); h=re.sub(r'<!--ld-->.*?<!--/ld-->\n?','',h,flags=re.S)
 h=h.replace("<style>",f"<!--og-->{OG}<!--/og--><!--ld-->{ldhtml}<!--/ld-->\n<style>",1)
 h=between(h,"<tbody>","</tbody>",rows)
+# Slack link: refresh every marked spot (newsletter box uses <p>, footer uses <span>)
+h=re.sub(r'<!--slack--><p class="slack">.*?<!--/slack-->',lambda m:SLACK_P,h,flags=re.S)
+h=re.sub(r'<!--slack--><span class="slack">.*?<!--/slack-->',lambda m:SLACK_SPAN,h,flags=re.S)
 h=between(h,'<p class="note" id="fx">',"</p>",fxline)
 h=between(h,'<ul id="log">',"</ul>",log)
-h=re.sub(r'<section id="faq">.*?</section>','',h,flags=re.S)
+h=re.sub(r'<section id="faq">.*?</section>\n?','',h,flags=re.S)
 h=h.replace('<section><h2>About</h2>',faqhtml+'\n<section><h2>About</h2>',1)
 h=h.replace('<a href="${esc(t.url)}" rel="nofollow noopener" target="_blank">${esc(t.tool)}</a></td>',
             '<a href="${esc(t.url)}" rel="nofollow noopener" target="_blank">${esc(t.tool)}</a><div class="note"><a href="/${t.tool.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}/">${esc(t.tool)} free plan details</a></div></td>')
@@ -75,8 +83,9 @@ for t in T:
 <p><a href="{E(t["source"])}" target="_blank" rel="noopener">Official {E(t["tool"])} pricing page</a> · <a href="/">Compare all tools in the table</a></p>
 </div>
 <section class="box"><h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>
-{BEEHIIV}</section></main>
-<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with {E(t["tool"])}.<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch</footer>
+{BEEHIIV}
+{SLACK_P}</section></main>
+<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with {E(t["tool"])}.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch</footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
 '''

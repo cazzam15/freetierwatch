@@ -1,8 +1,8 @@
 {
  "fx": {
-  "usd_gbp": 0.7549,
-  "date": "2026-10-16",
-  "source": "https://www.nimbuscalc.com/calculators/financial-calculators/currency-converter/USD-GBP-2026-10-16/"
+  "usd_gbp": 0.7503,
+  "date": "2026-10-19",
+  "source": "https://open.er-api.com/v6/latest/USD"
  },
  "tools": [
   {
@@ -10,21 +10,21 @@
    "url": "https://lovable.dev",
    "free": "5 build credits/day (max 30/month) + 20 Cloud credits/month",
    "paid_usd": 25,
-   "paid_gbp": 18.87,
+   "paid_gbp": 18.76,
    "paid_plan": "Pro, monthly",
    "source": "https://lovable.dev/pricing",
-   "checked": "2026-10-16",
-   "note": "Free allowance from lovable.dev/pricing FAQ. $25 Pro price from Lovable's own comparison guide (lovable.dev/guides/bolt-vs-replit-vs-lovable); pricing page text did not show prices when fetched."
+   "checked": "2026-10-19",
+   "note": "Free allowance from the lovable.dev/pricing FAQ. $25 Pro price (100 credits/month, billed monthly; $21/mo billed annually) from Lovable's docs (docs.lovable.dev/introduction/subscription-plans), as the pricing page didn't show prices when fetched."
   },
   {
    "tool": "Bolt.new",
    "url": "https://bolt.new",
    "free": "300K tokens/day, 1M tokens/month; Bolt branding",
    "paid_usd": 25,
-   "paid_gbp": 18.87,
+   "paid_gbp": 18.76,
    "paid_plan": "Pro, billed monthly",
    "source": "https://bolt.new/pricing",
-   "checked": "2026-10-16",
+   "checked": "2026-10-19",
    "note": ""
   },
   {
@@ -32,32 +32,32 @@
    "url": "https://v0.app",
    "free": "7 messages/day; deploy to Vercel",
    "paid_usd": 30,
-   "paid_gbp": 22.65,
+   "paid_gbp": 22.51,
    "paid_plan": "Plus, per user/month",
    "source": "https://v0.app/pricing",
-   "checked": "2026-10-16",
+   "checked": "2026-10-19",
    "note": "Prices exclude VAT."
   },
   {
    "tool": "Replit",
    "url": "https://replit.com",
-   "free": "unclear",
+   "free": "Starter: daily Agent credits (monthly cap), monthly cloud credits, Lite build only, 1 published app (link expires after 30 days), Replit badge",
    "paid_usd": 20,
-   "paid_gbp": 15.1,
+   "paid_gbp": 15.01,
    "paid_plan": "Core, monthly ($18 billed annually)",
    "source": "https://replit.com/pricing",
-   "checked": "2026-10-16",
-   "note": "Free plan details not shown on pricing page when fetched; check replit.com/pricing."
+   "checked": "2026-10-19",
+   "note": "Free plan details from Replit's docs (docs.replit.com/billing/plans/starter-plan); exact credit amounts aren't published. Full build, Plan Mode and connectors need Core."
   },
   {
    "tool": "Base44",
    "url": "https://base44.com",
    "free": "25 message credits + 100 integration credits/month, up to 5 apps",
    "paid_usd": 16,
-   "paid_gbp": 12.08,
+   "paid_gbp": 12.0,
    "paid_plan": "Starter, billed annually",
    "source": "https://base44.com/pricing",
-   "checked": "2026-10-16",
+   "checked": "2026-10-19",
    "note": "Starter is $16/mo billed annually; monthly price not shown (page says annual = 20% off, implying $20)."
   },
   {
@@ -65,10 +65,10 @@
    "url": "https://cursor.com",
    "free": "Limited agent and chat requests",
    "paid_usd": 8,
-   "paid_gbp": 6.04,
+   "paid_gbp": 6.0,
    "paid_plan": "Plus (Grok models only)",
    "source": "https://cursor.com/pricing",
-   "checked": "2026-10-16",
+   "checked": "2026-10-19",
    "note": "Plus includes Grok models only; Premium is $30/mo."
   },
   {
@@ -76,21 +76,21 @@
    "url": "https://windsurf.com",
    "free": "Light agent quota, unlimited Tab completions and inline edits",
    "paid_usd": 20,
-   "paid_gbp": 15.1,
+   "paid_gbp": 15.01,
    "paid_plan": "Pro, monthly",
-   "source": "https://windsurf.com/pricing",
-   "checked": "2026-10-16",
-   "note": ""
+   "source": "https://devin.ai/pricing",
+   "checked": "2026-10-19",
+   "note": "Windsurf is now called Devin Desktop (renamed June 2026); windsurf.com/pricing redirects to devin.ai/pricing."
   },
   {
    "tool": "Framer",
    "url": "https://www.framer.com",
    "free": "500 AI credits to try, free Framer domain, 1 GB bandwidth",
    "paid_usd": 10,
-   "paid_gbp": 7.55,
+   "paid_gbp": 7.5,
    "paid_plan": "Basic, per month (yearly billing)",
    "source": "https://www.framer.com/pricing",
-   "checked": "2026-10-16",
+   "checked": "2026-10-19",
    "note": "Price shown with yearly billing selected. Free plan is for non-commercial use."
   },
   {
@@ -98,21 +98,21 @@
    "url": "https://www.softr.io",
    "free": "5 AI credits/month, unlimited apps, 5K database records",
    "paid_usd": 19,
-   "paid_gbp": 14.34,
-   "paid_plan": "Basic, per month",
+   "paid_gbp": 14.26,
+   "paid_plan": "Basic, per month billed yearly ($25 billed monthly)",
    "source": "https://www.softr.io/pricing",
-   "checked": "2026-10-16",
-   "note": "Page has monthly/yearly toggle; unclear which billing the $19 reflects."
+   "checked": "2026-10-19",
+   "note": "$19/mo is the yearly-billing price ($228/year); Basic is $25 billed monthly (from the pricing page's own price data)."
   },
   {
    "tool": "Glide",
    "url": "https://www.glideapps.com",
    "free": "10 projects, limited credits, 2 team members",
    "paid_usd": 25,
-   "paid_gbp": 18.87,
+   "paid_gbp": 18.76,
    "paid_plan": "Basic (GlideOS), monthly, 100 credits",
    "source": "https://www.glideapps.com/pricing",
-   "checked": "2026-10-16",
+   "checked": "2026-10-19",
    "note": "GlideOS plans; Glide Classic has separate pricing."
   }
  ],

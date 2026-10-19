@@ -114,6 +114,28 @@
    "source": "https://www.glideapps.com/pricing",
    "checked": "2026-10-19",
    "note": "GlideOS plans; Glide Classic has separate pricing."
+  },
+  {
+   "tool": "Google AI Studio",
+   "url": "https://aistudio.google.com",
+   "free": "Build mode free with a modest daily quota (resets daily); web and Android apps",
+   "paid_usd": 19.99,
+   "paid_gbp": 18.99,
+   "paid_plan": "Google AI Pro, monthly (UK price £18.99)",
+   "source": "https://one.google.com/intl/en_gb/about/google-ai-plans/",
+   "checked": "2026-10-19",
+   "note": "No separate AI Studio plan: Google AI Pro gives higher daily AI Studio quotas (£18.99 is Google's UK price, not converted; $19.99 in the US). Android apps built in AI Studio can be published to a Google Play testing track (Play developer account needed), and since 13 Oct 2026 Google Play lets you run personal AI Studio apps on your own phone without a developer account (rolling out to select markets, starting with the US)."
+  },
+  {
+   "tool": "Emergent",
+   "url": "https://emergent.sh",
+   "free": "10 credits/month, web and mobile apps",
+   "paid_usd": 20,
+   "paid_gbp": 15.01,
+   "paid_plan": "Standard, monthly ($17 billed annually), 100 credits",
+   "source": "https://emergent.sh/pricing",
+   "checked": "2026-10-19",
+   "note": "Standard is $20/mo billed monthly or $17/mo billed yearly; extra credits can be bought."
   }
  ],
  "changelog": [
@@ -128,6 +150,18 @@
    "tool": "FreeTierWatch",
    "change": "Site launched with 10 tools.",
    "source": ""
+  },
+  {
+   "date": "2026-10-19",
+   "tool": "Google AI Studio",
+   "change": "Added to the tracker: Build mode is free with a daily quota; Google AI Pro (£18.99/mo UK) raises the limits. Google Play now lets you run personal apps built in AI Studio (announced 13 Oct).",
+   "source": "https://blog.google/products-and-platforms/platforms/google-play/google-play-updates-october-2026/"
+  },
+  {
+   "date": "2026-10-19",
+   "tool": "Emergent",
+   "change": "Added to the tracker: 10 free credits/month; Standard $20/mo (£15.01), or $17/mo billed yearly.",
+   "source": "https://emergent.sh/pricing"
   }
  ]
 }

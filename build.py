@@ -14,6 +14,7 @@ SLACK_TEXT="Join the free FreeTierWatch Slack community"
 SLACK_P=f'<!--slack--><p class="slack"><a href="{SLACK_URL}" target="_blank" rel="noopener">{SLACK_TEXT}</a></p><!--/slack-->'
 SLACK_SPAN=f'<!--slack--><span class="slack"><a href="{SLACK_URL}" target="_blank" rel="noopener">{SLACK_TEXT}</a></span><!--/slack-->'
 BEEHIIV='<script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="9023118a-54b2-4146-827a-5ed26d0013e0"></script>'
+PROMISE='<!--promise--><p class="promise"><strong>Free:</strong> subscribe for price-change alerts when a free plan or price changes, plus the one-page <a href="/cheat-sheet/">AI App Builder Free Plans Cheat Sheet (PDF)</a>.</p><!--/promise-->'
 def free_txt(t): return "Unclear (not shown on the pricing page when checked)" if t["free"]=="unclear" else t["free"]
 def row(t):
     f='<span class="unclear">Unclear</span>' if t["free"]=="unclear" else E(t["free"])
@@ -61,6 +62,8 @@ h=re.sub(r'<section id="faq">.*?</section>\n?','',h,flags=re.S)
 h=h.replace('<section><h2>About</h2>',faqhtml+'\n<section><h2>About</h2>',1)
 h=h.replace('<a href="${esc(t.url)}" rel="nofollow noopener" target="_blank">${esc(t.tool)}</a></td>',
             '<a href="${esc(t.url)}" rel="nofollow noopener" target="_blank">${esc(t.tool)}</a><div class="note"><a href="/${t.tool.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}/">${esc(t.tool)} free plan details</a></div></td>')
+h=re.sub(r'<!--promise-->.*?<!--/promise-->\n?','',h,flags=re.S)
+h=h.replace(BEEHIIV,PROMISE+"\n"+BEEHIIV,1)
 open("index.html","w").write(h)
 css=re.search(r"<style>.*?</style>",h,re.S).group(0)
 # --- tool pages
@@ -83,6 +86,7 @@ for t in T:
 <p><a href="{E(t["source"])}" target="_blank" rel="noopener">Official {E(t["tool"])} pricing page</a> · <a href="/">Compare all tools in the table</a></p>
 </div>
 <section class="box"><h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>
+{PROMISE}
 {BEEHIIV}
 {SLACK_P}</section></main>
 <footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with {E(t["tool"])}.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch</footer>
@@ -90,6 +94,26 @@ for t in T:
 </body></html>
 '''
     os.makedirs(s,exist_ok=True); open(f"{s}/index.html","w").write(page)
-urls=[("/",checked)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
+cs_title="AI App Builder Free Plans Cheat Sheet (Oct 2026)"
+cs_desc=f"Free one-page PDF: free plans and cheapest paid prices in £ for {len(T)} AI app builders, checked {checked}."
+cs=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{E(cs_title)}</title><meta name="description" content="{E(cs_desc)}"><link rel="canonical" href="{SITE}/cheat-sheet/">
+<meta property="og:title" content="{E(cs_title)}"><meta property="og:description" content="{E(cs_desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/cheat-sheet/">{OG}
+{css}</head><body>
+<header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(cs_title)}</h1></header>
+<main><div class="box">
+<p>{E(cs_desc)} Every figure comes from our <a href="/">live table</a>, with sources linked there.</p>
+<p><a href="/cheatsheet.pdf" download><strong>Download the cheat sheet (PDF)</strong></a></p>
+<p class="note">Prices change often, so check the official pricing page before you pay.</p>
+</div>
+<section class="box"><h2>Get price-change alerts</h2><p>Subscribe free and we'll email you when a free plan or price changes, plus an updated cheat sheet.</p>
+{BEEHIIV}
+{SLACK_P}</section></main>
+<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch</footer>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
+</body></html>
+'''
+os.makedirs("cheat-sheet",exist_ok=True); open("cheat-sheet/index.html","w").write(cs)
+urls=[("/",checked),("/cheat-sheet/",checked)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
 open("sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+"".join(f"<url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u,d in urls)+"</urlset>\n")
 print("\n".join(SITE+u for u,_ in urls))

@@ -19,7 +19,9 @@ def free_txt(t): return "Unclear (not shown on the pricing page when checked)" i
 def row(t):
     f='<span class="unclear">Unclear</span>' if t["free"]=="unclear" else E(t["free"])
     n=f'<div class="note">{E(t["note"])}</div>' if t["note"] else ""
-    return (f'<tr><td><a href="{E(t["url"])}" rel="nofollow noopener" target="_blank">{E(t["tool"])}</a>'
+    # aff_url (optional) = affiliate link; marked sponsored. The About section carries the disclosure.
+    link=f'<a href="{E(t["aff_url"])}" rel="sponsored nofollow noopener" target="_blank">' if t.get("aff_url") else f'<a href="{E(t["url"])}" rel="nofollow noopener" target="_blank">'
+    return (f'<tr><td>{link}{E(t["tool"])}</a>'
             f'<div class="note"><a href="/{slug(t["tool"])}/">{E(t["tool"])} free plan details</a></div></td>'
             f'<td>{f}{n}</td><td>£{t["paid_gbp"]:.2f}<div class="note">{E(t["paid_plan"])}</div></td>'
             f'<td>${t["paid_usd"]}</td><td>{E(t["checked"])}<div class="note"><a href="{E(t["source"])}" target="_blank" rel="noopener">source</a></div></td></tr>')

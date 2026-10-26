@@ -136,6 +136,17 @@
    "source": "https://emergent.sh/pricing",
    "checked": "2026-10-26",
    "note": "Standard is $20/mo billed monthly or $17/mo billed yearly; extra credits can be bought."
+  },
+  {
+   "tool": "Rocket",
+   "url": "https://www.rocket.new",
+   "free": "20 free credits, one-time (they never expire)",
+   "paid_usd": 25,
+   "paid_gbp": 18.7,
+   "paid_plan": "Pro, monthly, 100 credits/month",
+   "source": "https://www.rocket.new/pricing",
+   "checked": "2026-10-26",
+   "note": "Higher tier 'Rocket' is $50/month for 250 credits. The free allowance is a one-off pot, not a monthly refresh."
   }
  ],
  "changelog": [
@@ -162,6 +173,12 @@
    "tool": "Emergent",
    "change": "Added to the tracker: 10 free credits/month; Standard $20/mo (£15.01), or $17/mo billed yearly.",
    "source": "https://emergent.sh/pricing"
+  },
+  {
+   "date": "2026-10-26",
+   "tool": "Rocket",
+   "change": "Added to the tracker: 20 free credits (one-time, never expire); Pro $25/mo (£18.70) for 100 credits.",
+   "source": "https://www.rocket.new/pricing"
   }
  ]
 }

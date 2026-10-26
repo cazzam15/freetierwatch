@@ -95,7 +95,8 @@ for t in T:
 '''
     os.makedirs(s,exist_ok=True); open(f"{s}/index.html","w").write(page)
 cs_title="AI App Builder Free Plans Cheat Sheet (Oct 2026)"
-cs_desc=f"Free one-page PDF: free plans and cheapest paid prices in £ for {len(T)} AI app builders, checked {checked}."
+CS_TOOLS=12  # tools in cheatsheet.pdf; bump when the PDF is regenerated
+cs_desc=f"Free one-page PDF: free plans and cheapest paid prices in £ for {CS_TOOLS} AI app builders, checked {checked}."
 cs=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(cs_title)}</title><meta name="description" content="{E(cs_desc)}"><link rel="canonical" href="{SITE}/cheat-sheet/">
 <meta property="og:title" content="{E(cs_title)}"><meta property="og:description" content="{E(cs_desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/cheat-sheet/">{OG}

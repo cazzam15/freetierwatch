@@ -1,7 +1,7 @@
 {
  "fx": {
-  "usd_gbp": 0.7478,
-  "date": "2026-10-26",
+  "usd_gbp": 0.7469,
+  "date": "2026-11-02",
   "source": "https://open.er-api.com/v6/latest/USD"
  },
  "tools": [
@@ -10,10 +10,10 @@
    "url": "https://lovable.dev",
    "free": "5 build credits/day (max 30/month) + 20 Cloud credits/month",
    "paid_usd": 25,
-   "paid_gbp": 18.7,
+   "paid_gbp": 18.67,
    "paid_plan": "Pro, monthly",
    "source": "https://lovable.dev/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "Free allowance from the lovable.dev/pricing FAQ. $25 Pro price (100 credits/month, billed monthly; $21/mo billed annually) from Lovable's docs (docs.lovable.dev/introduction/subscription-plans), as the pricing page didn't show prices when fetched."
   },
   {
@@ -21,10 +21,10 @@
    "url": "https://bolt.new",
    "free": "300K tokens/day, 1M tokens/month; Bolt branding",
    "paid_usd": 25,
-   "paid_gbp": 18.7,
+   "paid_gbp": 18.67,
    "paid_plan": "Pro, billed monthly",
    "source": "https://bolt.new/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": ""
   },
   {
@@ -32,10 +32,10 @@
    "url": "https://v0.app",
    "free": "7 messages/day; deploy to Vercel",
    "paid_usd": 30,
-   "paid_gbp": 22.43,
+   "paid_gbp": 22.41,
    "paid_plan": "Plus, per user/month",
    "source": "https://v0.app/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "Prices exclude VAT."
   },
   {
@@ -43,10 +43,10 @@
    "url": "https://replit.com",
    "free": "Starter: daily Agent credits (monthly cap), monthly cloud credits, Lite build only, 1 published app (link expires after 30 days), Replit badge",
    "paid_usd": 20,
-   "paid_gbp": 14.96,
+   "paid_gbp": 14.94,
    "paid_plan": "Core, monthly ($18 billed annually)",
    "source": "https://replit.com/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "Free plan details from Replit's docs (docs.replit.com/billing/plans/starter-plan); exact credit amounts aren't published. Full build, Plan Mode and connectors need Core."
   },
   {
@@ -54,11 +54,12 @@
    "url": "https://base44.com",
    "free": "25 message credits + 100 integration credits/month, up to 5 apps",
    "paid_usd": 16,
-   "paid_gbp": 11.96,
+   "paid_gbp": 11.95,
    "paid_plan": "Starter, billed annually",
    "source": "https://base44.com/pricing",
-   "checked": "2026-10-26",
-   "note": "Starter is $16/mo billed annually; monthly price not shown (page says annual = 20% off, implying $20)."
+   "checked": "2026-11-02",
+   "note": "Starter is $16/mo billed annually; monthly price not shown (page says annual = 20% off, implying $20).",
+   "aff_url": "https://base44.pxf.io/c/7982449/3980634/25619?trafcat=lp&prompt_text=null"
   },
   {
    "tool": "Cursor",
@@ -68,7 +69,7 @@
    "paid_gbp": 5.98,
    "paid_plan": "Plus (Grok models only)",
    "source": "https://cursor.com/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "Plus includes Grok models only; Premium is $30/mo."
   },
   {
@@ -76,10 +77,10 @@
    "url": "https://windsurf.com",
    "free": "Light agent quota, unlimited Tab completions and inline edits",
    "paid_usd": 20,
-   "paid_gbp": 14.96,
+   "paid_gbp": 14.94,
    "paid_plan": "Pro, monthly",
    "source": "https://devin.ai/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "Windsurf is now called Devin Desktop (renamed June 2026); windsurf.com/pricing redirects to devin.ai/pricing."
   },
   {
@@ -87,10 +88,10 @@
    "url": "https://www.framer.com",
    "free": "500 AI credits to try, free Framer domain, 1 GB bandwidth",
    "paid_usd": 10,
-   "paid_gbp": 7.48,
+   "paid_gbp": 7.47,
    "paid_plan": "Basic, per month (yearly billing)",
    "source": "https://www.framer.com/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "Price shown with yearly billing selected. Free plan is for non-commercial use."
   },
   {
@@ -99,10 +100,10 @@
    "aff_url": "https://get.softr.io/zluqvhb90jln-zceww9",
    "free": "5 AI credits/month, unlimited apps, 5K database records",
    "paid_usd": 19,
-   "paid_gbp": 14.21,
+   "paid_gbp": 14.19,
    "paid_plan": "Basic, per month billed yearly ($25 billed monthly)",
    "source": "https://www.softr.io/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "$19/mo is the yearly-billing price ($228/year); Basic is $25 billed monthly (from the pricing page's own price data)."
   },
   {
@@ -110,10 +111,10 @@
    "url": "https://www.glideapps.com",
    "free": "10 projects, limited credits, 2 team members",
    "paid_usd": 25,
-   "paid_gbp": 18.7,
+   "paid_gbp": 18.67,
    "paid_plan": "Basic (GlideOS), monthly, 100 credits",
    "source": "https://www.glideapps.com/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "GlideOS plans; Glide Classic has separate pricing."
   },
   {
@@ -124,7 +125,7 @@
    "paid_gbp": 18.99,
    "paid_plan": "Google AI Pro, monthly (UK price £18.99)",
    "source": "https://one.google.com/intl/en_gb/about/google-ai-plans/",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "No separate AI Studio plan: Google AI Pro gives higher daily AI Studio quotas (£18.99 is Google's UK price, not converted; $19.99 in the US). Android apps built in AI Studio can be published to a Google Play testing track (Play developer account needed), and since 13 Oct 2026 Google Play lets you run personal AI Studio apps on your own phone without a developer account (rolling out to select markets, starting with the US)."
   },
   {
@@ -132,10 +133,10 @@
    "url": "https://emergent.sh",
    "free": "10 credits/month, web and mobile apps",
    "paid_usd": 20,
-   "paid_gbp": 14.96,
+   "paid_gbp": 14.94,
    "paid_plan": "Standard, monthly ($17 billed annually), 100 credits",
    "source": "https://emergent.sh/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "Standard is $20/mo billed monthly or $17/mo billed yearly; extra credits can be bought."
   },
   {
@@ -143,11 +144,33 @@
    "url": "https://www.rocket.new",
    "free": "20 free credits, one-time (they never expire)",
    "paid_usd": 25,
-   "paid_gbp": 18.7,
+   "paid_gbp": 18.67,
    "paid_plan": "Pro, monthly, 100 credits/month",
    "source": "https://www.rocket.new/pricing",
-   "checked": "2026-10-26",
+   "checked": "2026-11-02",
    "note": "Higher tier 'Rocket' is $50/month for 250 credits. The free allowance is a one-off pot, not a monthly refresh."
+  },
+  {
+   "tool": "GitHub Copilot",
+   "url": "https://github.com/features/copilot",
+   "free": "2,000 code completions/month, limited chat and agent use, entry-level models",
+   "paid_usd": 10,
+   "paid_gbp": 7.47,
+   "paid_plan": "Pro, per month",
+   "source": "https://github.com/features/copilot/plans",
+   "checked": "2026-11-02",
+   "note": "Pro gives unlimited completions plus a monthly pool of GitHub AI Credits for chat and agents (1 credit = $0.01). Pro+ is $39/month."
+  },
+  {
+   "tool": "Kiro",
+   "url": "https://kiro.dev",
+   "free": "50 credits/month, open-weight models and Claude Sonnet 4.5 (with limits)",
+   "paid_usd": 20,
+   "paid_gbp": 14.94,
+   "paid_plan": "Pro, per user/month, 1,000 credits",
+   "source": "https://kiro.dev/pricing/",
+   "checked": "2026-11-02",
+   "note": "Kiro is an AI coding app (IDE) from AWS. First upgrade to Pro gives the rest of that month free plus 500 trial credits. Extra credits $0.04 each. Prices exclude VAT."
   }
  ],
  "changelog": [
@@ -180,6 +203,18 @@
    "tool": "Rocket",
    "change": "Added to the tracker: 20 free credits (one-time, never expire); Pro $25/mo (£18.70) for 100 credits.",
    "source": "https://www.rocket.new/pricing"
+  },
+  {
+   "date": "2026-11-02",
+   "tool": "GitHub Copilot",
+   "change": "Added to the tracker: free plan with 2,000 code completions a month plus limited chat and agent use; Pro $10/mo (£7.47).",
+   "source": "https://github.com/features/copilot/plans"
+  },
+  {
+   "date": "2026-11-02",
+   "tool": "Kiro",
+   "change": "Added to the tracker: 50 free credits a month; Pro $20/mo (£14.94) for 1,000 credits.",
+   "source": "https://kiro.dev/pricing/"
   }
  ]
 }

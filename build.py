@@ -38,7 +38,19 @@ faq=[("Which AI app builder has the best free plan?",
      ("Which AI app builder is cheapest to upgrade?",
       f'{cheap["tool"]} has the lowest cheapest paid plan in our table: {cheap["paid_plan"]} at ${cheap["paid_usd"]} (about £{cheap["paid_gbp"]:.2f}) a month.'+(f' Note: {cheap["note"]}' if cheap["note"] else "")),
      ("Is Lovable free?",faqa("Lovable")),("Is Bolt.new free?",faqa("Bolt.new")),("Is Replit free?",faqa("Replit"))]
-faqhtml='<section id="faq"><h2>FAQ</h2>'+"".join(f'<h3>{E(q)}</h3><p>{E(a)}</p>' for q,a in faq)+'</section>'
+CMP=["Lovable","Bolt.new","Replit"]; CMP_SLUG="lovable-vs-bolt-vs-replit"
+faqhtml=('<section id="faq"><h2>FAQ</h2>'+"".join(f'<h3>{E(q)}</h3><p>{E(a)}</p>' for q,a in faq)
+         +f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p></section>')
+def jsonld(x): return '<script type="application/ld+json">'+json.dumps(x,ensure_ascii=False).replace("</","<\\/")+'</script>'
+def faqld(qa): return {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in qa]}
+def gbpa(t):
+    p=f'{t["tool"]}\'s cheapest paid plan is {t["paid_plan"]} at ${t["paid_usd"]} (about £{t["paid_gbp"]:.2f}) a month'
+    # Google AI Studio's £ price is Google's own UK price, not a conversion
+    if t["tool"]=="Google AI Studio": return f'{p}. £{t["paid_gbp"]:.2f} is Google\'s own UK price, not a conversion. Checked {t["checked"]}.'
+    return f'{p}, converted at 1 USD = {FX["usd_gbp"]} GBP on {FX["date"]}. Checked {t["checked"]}.'
+ALPHA=sorted(T,key=lambda t:t["tool"].lower())
+def others(t,n=4):
+    i=ALPHA.index(t); return [ALPHA[(i+k)%len(ALPHA)] for k in range(1,n+1)]
 ld=[{"@context":"https://schema.org","@type":"WebSite","name":"FreeTierWatch","url":SITE+"/","inLanguage":"en-GB",
      "description":"Independent, dated tracker of free plans and cheapest paid plans for AI app builders, with prices in GBP."},
     {"@context":"https://schema.org","@type":"ItemList","name":"AI app builder free plans and prices in £","itemListElement":
@@ -74,10 +86,18 @@ for t in T:
     desc=f'{t["tool"]} free plan: {free_txt(t)}. Cheapest paid: {t["paid_plan"]}, ${t["paid_usd"]} (about £{t["paid_gbp"]:.2f})/month. Checked {t["checked"]}.'
     pl={"@context":"https://schema.org","@type":"WebPage","name":title,"url":f"{SITE}/{s}/","dateModified":t["checked"],"description":desc,
         "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
+    tqa=[(f'Is {t["tool"]} free?',faqa(t["tool"])),(f'How much is {t["tool"]} in pounds?',gbpa(t))]
+    crumbs={"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+        {"@type":"ListItem","position":1,"name":"FreeTierWatch","item":SITE+"/"},
+        {"@type":"ListItem","position":2,"name":t["tool"],"item":f"{SITE}/{s}/"}]}
+    cmp=f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p>' if t["tool"] in CMP else ""
+    extra=(f'<section class="box"><h2>FAQ</h2>'+"".join(f'<h3>{E(q)}</h3><p>{E(a)}</p>' for q,a in tqa)+'</section>\n'
+           '<section class="box"><h2>Other free plans to compare</h2><ul>'
+           +"".join(f'<li><a href="/{slug(o["tool"])}/">{E(o["tool"])} free plan</a></li>' for o in others(t))+f'</ul>{cmp}</section>')
     page=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(title)}</title><meta name="description" content="{E(desc)}"><link rel="canonical" href="{SITE}/{s}/">
 <meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/{s}/">{OG}
-<script type="application/ld+json">{json.dumps(pl,ensure_ascii=False)}</script>
+<script type="application/ld+json">{json.dumps(pl,ensure_ascii=False)}</script>{jsonld(faqld(tqa))}{jsonld(crumbs)}
 {css}</head><body>
 <header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(title)}</h1></header>
 <main><div class="box">
@@ -87,6 +107,7 @@ for t in T:
 <p class="note">Last checked: {E(t["checked"])}. Converted at 1 USD = {FX["usd_gbp"]} GBP ({E(FX["date"])}). Prices change often, so check before you pay.</p>
 <p><a href="{E(t["source"])}" target="_blank" rel="noopener">Official {E(t["tool"])} pricing page</a> · <a href="/">Compare all tools in the table</a></p>
 </div>
+{extra}
 <section class="box"><h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>
 {PROMISE}
 {BEEHIIV}
@@ -117,6 +138,36 @@ cs=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name=
 </body></html>
 '''
 os.makedirs("cheat-sheet",exist_ok=True); open("cheat-sheet/index.html","w").write(cs)
-urls=[("/",checked),("/cheat-sheet/",checked)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
+# --- comparison page: Lovable vs Bolt vs Replit
+CT=[by[n] for n in CMP]; cchk=max(t["checked"] for t in CT)
+c_title=f"Lovable vs Bolt vs Replit free plans compared ({month(cchk)})"
+c_desc=f"Lovable, Bolt.new and Replit side by side: free plan, cheapest paid plan in £ and $, and official pricing sources. Checked {cchk}."
+c_qa=[(f"Is {n} free?",faqa(n)) for n in CMP]
+c_pl={"@context":"https://schema.org","@type":"WebPage","name":c_title,"url":f"{SITE}/{CMP_SLUG}/","dateModified":cchk,"description":c_desc,
+      "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
+c_rows="".join(f'<tr><td><a href="/{slug(t["tool"])}/">{E(t["tool"])}</a></td><td>{E(free_txt(t))}</td>'
+               f'<td>£{t["paid_gbp"]:.2f}<div class="note">${t["paid_usd"]}</div></td><td>{E(t["paid_plan"])}</td>'
+               f'<td>{E(t["checked"])}<div class="note"><a href="{E(t["source"])}" target="_blank" rel="noopener">official pricing</a></div></td></tr>' for t in CT)
+cmp_page=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{E(c_title)}</title><meta name="description" content="{E(c_desc)}"><link rel="canonical" href="{SITE}/{CMP_SLUG}/">
+<meta property="og:title" content="{E(c_title)}"><meta property="og:description" content="{E(c_desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/{CMP_SLUG}/">{OG}
+{jsonld(c_pl)}{jsonld(faqld(c_qa))}
+{css}<style>.nosort th{{cursor:auto}}.nosort th:after{{content:none}}</style></head><body>
+<header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(c_title)}</h1></header>
+<main><div class="box">
+<div class="wrap"><table class="nosort"><thead><tr><th>Tool</th><th>Free plan</th><th>Cheapest paid</th><th>Plan</th><th>Last checked</th></tr></thead><tbody>{c_rows}</tbody></table></div>
+<p class="note">£ prices converted at 1 USD = {FX["usd_gbp"]} GBP ({E(FX["date"])}). Prices exclude VAT unless stated and change often, so check before you pay. <a href="/">Compare all tools in the table</a></p>
+</div>
+<section class="box"><h2>FAQ</h2>{"".join(f"<h3>{E(q)}</h3><p>{E(a)}</p>" for q,a in c_qa)}</section>
+<section class="box"><h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>
+{PROMISE}
+{BEEHIIV}
+{SLACK_P}</section></main>
+<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch</footer>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
+</body></html>
+'''
+os.makedirs(CMP_SLUG,exist_ok=True); open(f"{CMP_SLUG}/index.html","w").write(cmp_page)
+urls=[("/",checked),("/cheat-sheet/",checked),(f"/{CMP_SLUG}/",cchk)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
 open("sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+"".join(f"<url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u,d in urls)+"</urlset>\n")
 print("\n".join(SITE+u for u,_ in urls))

@@ -94,6 +94,9 @@ for t in T:
     extra=(f'<section class="box"><h2>FAQ</h2>'+"".join(f'<h3>{E(q)}</h3><p>{E(a)}</p>' for q,a in tqa)+'</section>\n'
            '<section class="box"><h2>Other free plans to compare</h2><ul>'
            +"".join(f'<li><a href="/{slug(o["tool"])}/">{E(o["tool"])} free plan</a></li>' for o in others(t))+f'</ul>{cmp}</section>')
+    # affiliate link (only tools with aff_url), with a disclosure on the same page
+    aff=(f'\n<p><a href="{E(t["aff_url"])}" rel="sponsored nofollow noopener" target="_blank"><strong>Try {E(t["tool"])}</strong></a></p>'
+         f'<p class="note">Affiliate link: if you sign up through it, FreeTierWatch may earn a commission at no extra cost to you. That never changes what\'s on this page.</p>') if t.get("aff_url") else ""
     page=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(title)}</title><meta name="description" content="{E(desc)}"><link rel="canonical" href="{SITE}/{s}/">
 <meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/{s}/">{OG}
@@ -105,7 +108,7 @@ for t in T:
 <h2>Cheapest paid plan</h2><p><strong>£{t["paid_gbp"]:.2f}/month</strong> (${t["paid_usd"]} US) · {E(t["paid_plan"])}</p>
 {f'<p class="note">{E(t["note"])}</p>' if t["note"] else ""}
 <p class="note">Last checked: {E(t["checked"])}. Converted at 1 USD = {FX["usd_gbp"]} GBP ({E(FX["date"])}). Prices change often, so check before you pay.</p>
-<p><a href="{E(t["source"])}" target="_blank" rel="noopener">Official {E(t["tool"])} pricing page</a> · <a href="/">Compare all tools in the table</a></p>
+<p><a href="{E(t["source"])}" target="_blank" rel="noopener">Official {E(t["tool"])} pricing page</a> · <a href="/">Compare all tools in the table</a></p>{aff}
 </div>
 {extra}
 <section class="box"><h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>

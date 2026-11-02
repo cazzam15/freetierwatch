@@ -94,6 +94,9 @@ for t in T:
     extra=(f'<section class="box"><h2>FAQ</h2>'+"".join(f'<h3>{E(q)}</h3><p>{E(a)}</p>' for q,a in tqa)+'</section>\n'
            '<section class="box"><h2>Other free plans to compare</h2><ul>'
            +"".join(f'<li><a href="/{slug(o["tool"])}/">{E(o["tool"])} free plan</a></li>' for o in others(t))+f'</ul>{cmp}</section>')
+    # affiliate link (only tools with aff_url), with a disclosure on the same page
+    aff=(f'\n<p><a href="{E(t["aff_url"])}" rel="sponsored nofollow noopener" target="_blank"><strong>Try {E(t["tool"])}</strong></a></p>'
+         f'<p class="note">Affiliate link: if you sign up through it, FreeTierWatch may earn a commission at no extra cost to you. That never changes what\'s on this page.</p>') if t.get("aff_url") else ""
     page=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(title)}</title><meta name="description" content="{E(desc)}"><link rel="canonical" href="{SITE}/{s}/">
 <meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/{s}/">{OG}
@@ -105,14 +108,14 @@ for t in T:
 <h2>Cheapest paid plan</h2><p><strong>£{t["paid_gbp"]:.2f}/month</strong> (${t["paid_usd"]} US) · {E(t["paid_plan"])}</p>
 {f'<p class="note">{E(t["note"])}</p>' if t["note"] else ""}
 <p class="note">Last checked: {E(t["checked"])}. Converted at 1 USD = {FX["usd_gbp"]} GBP ({E(FX["date"])}). Prices change often, so check before you pay.</p>
-<p><a href="{E(t["source"])}" target="_blank" rel="noopener">Official {E(t["tool"])} pricing page</a> · <a href="/">Compare all tools in the table</a></p>
+<p><a href="{E(t["source"])}" target="_blank" rel="noopener">Official {E(t["tool"])} pricing page</a> · <a href="/">Compare all tools in the table</a></p>{aff}
 </div>
 {extra}
 <section class="box"><h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>
 {PROMISE}
 {BEEHIIV}
 {SLACK_P}</section></main>
-<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with {E(t["tool"])}.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch</footer>
+<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with {E(t["tool"])}.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
 '''
@@ -133,7 +136,7 @@ cs=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name=
 <section class="box"><h2>Get price-change alerts</h2><p>Subscribe free and we'll email you when a free plan or price changes, plus an updated cheat sheet.</p>
 {BEEHIIV}
 {SLACK_P}</section></main>
-<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch</footer>
+<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
 '''
@@ -163,11 +166,44 @@ cmp_page=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta
 {PROMISE}
 {BEEHIIV}
 {SLACK_P}</section></main>
-<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch</footer>
+<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
 '''
 os.makedirs(CMP_SLUG,exist_ok=True); open(f"{CMP_SLUG}/index.html","w").write(cmp_page)
-urls=[("/",checked),("/cheat-sheet/",checked),(f"/{CMP_SLUG}/",cchk)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
+# --- privacy page (operator, contact and services agreed with Caroline 1 Nov 2026)
+CONTACT="hello@freetierwatch.co.uk"
+pv_title="Privacy policy"
+pv_desc="What personal data FreeTierWatch collects, why, who handles it and how to contact us."
+pv_body=f"""<p class="note">Last updated 2 November 2026</p>
+<p>This explains what personal data freetierwatch.co.uk collects and how it's used. The site has no accounts and no adverts, and it doesn't set any cookies of its own, so it collects very little.</p>
+<h2>Who's responsible</h2>
+<p>The site is run by C. Morrison in the United Kingdom, who is the data controller for the information below. Contact: <a href="mailto:{CONTACT}">{CONTACT}</a>.</p>
+<h2>Newsletter sign-up</h2>
+<p>If you subscribe using the sign-up form, your email address is stored by beehiiv, the newsletter service, and used only to send FreeTierWatch emails (price-change alerts and the cheat sheet). The form is loaded from beehiiv, so beehiiv's own privacy policy applies to it. beehiiv may record whether emails are opened and links are clicked. The legal basis is your consent. Every email has an unsubscribe link, and your address is kept until you unsubscribe or ask for it to be deleted.</p>
+<h2>Analytics</h2>
+<p>The site uses Cloudflare Web Analytics, which doesn't set cookies or follow you across other sites. It only records things like which page was viewed, the site you came from, and your browser and country. The legal basis is the site's legitimate interest in knowing which pages are useful. There's no Google Analytics.</p>
+<h2>Links to other sites</h2>
+<p>Links to the tools, the Slack community, Instagram, X and GitHub take you to other sites, where their own privacy policies and cookies apply. Some tool links are affiliate links (marked as sponsored in the page code): once you click through, the tool or its affiliate network may use cookies to record that you came from FreeTierWatch.</p>
+<h2>Who else handles data</h2>
+<ul><li>GitHub Pages hosts the site and keeps standard web request logs, including your IP address.</li>
+<li>beehiiv stores newsletter subscribers' email addresses.</li>
+<li>Cloudflare processes the visit statistics above and forwards emails sent to {CONTACT}.</li></ul>
+<p>Some of these providers are in the United States. Those transfers are covered by the UK's approved safeguards (the UK International Data Transfer Addendum and the UK-US data bridge where it applies). Your data is never sold.</p>
+<h2>Your rights</h2>
+<p>You can ask to see or delete your data, or withdraw consent, at any time by emailing <a href="mailto:{CONTACT}">{CONTACT}</a>. If you're unhappy with how your data has been handled, you can complain to the Information Commissioner's Office at <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>.</p>"""
+pv=f"""<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{E(pv_title)} | FreeTierWatch</title><meta name="description" content="{E(pv_desc)}"><link rel="canonical" href="{SITE}/privacy/">
+{css}</head><body>
+<header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(pv_title)}</h1></header>
+<main><div class="box">
+{pv_body}
+</div></main>
+<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
+</body></html>
+"""
+os.makedirs("privacy",exist_ok=True); open("privacy/index.html","w").write(pv)
+urls=[("/",checked),("/cheat-sheet/",checked),("/privacy/","2026-11-02"),(f"/{CMP_SLUG}/",cchk)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
 open("sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+"".join(f"<url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u,d in urls)+"</urlset>\n")
 print("\n".join(SITE+u for u,_ in urls))

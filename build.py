@@ -21,7 +21,8 @@ def row(t):
     n=f'<div class="note">{E(t["note"])}</div>' if t["note"] else ""
     # aff_url (optional) = affiliate link; marked sponsored. The About section carries the disclosure.
     link=f'<a href="{E(t["aff_url"])}" rel="sponsored nofollow noopener" target="_blank">' if t.get("aff_url") else f'<a href="{E(t["url"])}" rel="nofollow noopener" target="_blank">'
-    return (f'<tr><td>{link}{E(t["tool"])}</a>'
+    aff_label='<div class="note">Affiliate link</div>' if t.get("aff_label") else ""
+    return (f'<tr><td>{link}{E(t["tool"])}</a>{aff_label}'
             f'<div class="note"><a href="/{slug(t["tool"])}/">{E(t["tool"])} free plan details</a></div></td>'
             f'<td>{f}{n}</td><td>£{t["paid_gbp"]:.2f}<div class="note">{E(t["paid_plan"])}</div></td>'
             f'<td>${t["paid_usd"]}</td><td>{E(t["checked"])}<div class="note"><a href="{E(t["source"])}" target="_blank" rel="noopener">source</a></div></td></tr>')

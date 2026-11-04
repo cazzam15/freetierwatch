@@ -8,6 +8,8 @@
   {
    "tool": "Lovable",
    "url": "https://lovable.dev",
+   "aff_url": "https://lovablelabs.pxf.io/oNKX7E",
+   "aff_label": true,
    "free": "5 build credits/day (max 30/month) + 20 Cloud credits/month",
    "paid_usd": 25,
    "paid_gbp": 18.67,

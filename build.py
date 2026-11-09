@@ -15,6 +15,14 @@ SLACK_P=f'<!--slack--><p class="slack"><a href="{SLACK_URL}" target="_blank" rel
 SLACK_SPAN=f'<!--slack--><span class="slack"><a href="{SLACK_URL}" target="_blank" rel="noopener">{SLACK_TEXT}</a></span><!--/slack-->'
 BEEHIIV='<script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="9023118a-54b2-4146-827a-5ed26d0013e0"></script>'
 PROMISE='<!--promise--><p class="promise"><strong>Free:</strong> subscribe for price-change alerts when a free plan or price changes, plus the one-page <a href="/cheat-sheet/">AI App Builder Free Plans Cheat Sheet (PDF)</a>.</p><!--/promise-->'
+# Newsletter signup copy (one wording everywhere). SIGNUP = compact box after the main table/summary;
+# NEWS_BOX = the Newsletter section near the footer (adds the cheat-sheet line and the Slack link).
+GUIDE_SLUG="free-builder-guide"
+NEWS_TOP='<h2>Get an email when a free plan changes</h2><p>One short email every Monday. Free, unsubscribe any time.</p>'
+NEWS_HEAD=NEWS_TOP+f'<p class="note">Plus our free guide: <a href="/{GUIDE_SLUG}/">which AI builder to pick</a></p>'
+SIGNUP=f'<!--signup--><section class="box signup">{NEWS_HEAD}\n{BEEHIIV}</section><!--/signup-->'
+def news_box(head=None): return f'<section class="box">{head or NEWS_HEAD}\n{PROMISE}\n{BEEHIIV}\n{SLACK_P}</section>'
+NEWS_BOX=news_box()
 def free_txt(t): return "Unclear (not shown on the pricing page when checked)" if t["free"]=="unclear" else t["free"]
 def row(t):
     f='<span class="unclear">Unclear</span>' if t["free"]=="unclear" else E(t["free"])
@@ -43,7 +51,7 @@ CMP=["Lovable","Bolt.new","Replit"]; CMP_SLUG="lovable-vs-bolt-vs-replit"
 CODE=["Cursor","Windsurf","GitHub Copilot","Kiro","Google Antigravity"]; CODE_SLUG="free-ai-coding-tools"
 CODE_LINK=f'<p><a href="/{CODE_SLUG}/">Compare free AI coding tools: Cursor, Windsurf, GitHub Copilot, Kiro and Antigravity</a></p>'
 faqhtml=('<section id="faq"><h2>FAQ</h2>'+"".join(f'<h3>{E(q)}</h3><p>{E(a)}</p>' for q,a in faq)
-         +f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p>'+CODE_LINK+'</section>')
+         +f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p>'+CODE_LINK+f'<p><a href="/{GUIDE_SLUG}/">Free guide: which free AI app builder should I pick?</a></p></section>')
 def jsonld(x): return '<script type="application/ld+json">'+json.dumps(x,ensure_ascii=False).replace("</","<\\/")+'</script>'
 def faqld(qa): return {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in qa]}
 def gbpa(t):
@@ -74,13 +82,17 @@ h=between(h,"<tbody>","</tbody>",rows)
 h=re.sub(r'<!--slack--><p class="slack">.*?<!--/slack-->',lambda m:SLACK_P,h,flags=re.S)
 h=re.sub(r'<!--slack--><span class="slack">.*?<!--/slack-->',lambda m:SLACK_SPAN,h,flags=re.S)
 h=between(h,'<p class="note" id="fx">',"</p>",fxline)
+h=re.sub(r'<!--signup-->.*?<!--/signup-->\n?','',h,flags=re.S)
+h=h.replace('<p class="note" id="fx">'+fxline+'</p>\n','<p class="note" id="fx">'+fxline+'</p>\n'+SIGNUP+'\n',1)
+h=re.sub(r'<section class="box">(<h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>|<!--newshead-->.*?<!--/newshead-->)',
+         lambda m:'<section class="box"><!--newshead-->'+NEWS_HEAD+'<!--/newshead-->',h,count=1,flags=re.S)
 h=between(h,'<ul id="log">',"</ul>",log)
 h=re.sub(r'<section id="faq">.*?</section>\n?','',h,flags=re.S)
 h=h.replace('<section><h2>About</h2>',faqhtml+'\n<section><h2>About</h2>',1)
 h=h.replace('<a href="${esc(t.url)}" rel="nofollow noopener" target="_blank">${esc(t.tool)}</a></td>',
             '<a href="${esc(t.url)}" rel="nofollow noopener" target="_blank">${esc(t.tool)}</a><div class="note"><a href="/${t.tool.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}/">${esc(t.tool)} free plan details</a></div></td>')
 h=re.sub(r'<!--promise-->.*?<!--/promise-->\n?','',h,flags=re.S)
-h=h.replace(BEEHIIV,PROMISE+"\n"+BEEHIIV,1)
+h=h.replace("<!--/newshead-->\n","<!--/newshead-->\n"+PROMISE+"\n",1)
 open("index.html","w").write(h)
 css=re.search(r"<style>.*?</style>",h,re.S).group(0)
 # --- tool pages
@@ -113,11 +125,9 @@ for t in T:
 <p class="note">Last checked: {E(t["checked"])}. Converted at 1 USD = {FX["usd_gbp"]} GBP ({E(FX["date"])}). Prices change often, so check before you pay.</p>
 <p><a href="{E(t["source"])}" target="_blank" rel="noopener">Official {E(t["tool"])} pricing page</a> · <a href="/">Compare all tools in the table</a></p>{aff}
 </div>
+{SIGNUP}
 {extra}
-<section class="box"><h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>
-{PROMISE}
-{BEEHIIV}
-{SLACK_P}</section></main>
+{NEWS_BOX}</main>
 <footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with {E(t["tool"])}.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
@@ -165,11 +175,9 @@ def make_cmp(names,cslug,title_base,desc_base,extra_qa=()):
 <div class="wrap"><table class="nosort"><thead><tr><th>Tool</th><th>Free plan</th><th>Cheapest paid</th><th>Plan</th><th>Last checked</th></tr></thead><tbody>{c_rows}</tbody></table></div>
 <p class="note">£ prices converted at 1 USD = {FX["usd_gbp"]} GBP ({E(FX["date"])}). Prices exclude VAT unless stated and change often, so check before you pay. <a href="/">Compare all tools in the table</a></p>
 </div>
+{SIGNUP}
 <section class="box"><h2>FAQ</h2>{"".join(f"<h3>{E(q)}</h3><p>{E(a)}</p>" for q,a in c_qa)}</section>
-<section class="box"><h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>
-{PROMISE}
-{BEEHIIV}
-{SLACK_P}</section></main>
+{NEWS_BOX}</main>
 <footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
@@ -183,6 +191,59 @@ def code_cheapest(CT,cchk):
 code_chk=make_cmp(CODE,CODE_SLUG,"Free AI coding tools compared: Cursor, Windsurf, GitHub Copilot, Kiro and Antigravity",
     "Free plans of AI coding apps side by side: Cursor, Windsurf, GitHub Copilot, Kiro and Google Antigravity, with the cheapest paid plan in £ and $ and official pricing sources.",
     [("Which free AI coding tool is cheapest to upgrade?",code_cheapest)])
+# --- free guide page: /free-builder-guide/ from free-builder-guide.md (small markdown subset: #/## headings,
+# paragraphs, - and 1. lists, | tables, ---, **bold**, *italic*, [text](url), bare https:// links)
+def md_inline(x):
+    x=E(x).replace("&#x27;","'")
+    x=re.sub(r'\[([^\]]+)\]\((https?://[^)\s]+)\)',lambda m:f'<a href="{m.group(2)}">{m.group(1)}</a>',x)
+    x=re.sub(r'(?<!href=")(https://[^\s<]+[^\s<.,)])',lambda m:f'<a href="{m.group(1)}">{m.group(1)}</a>',x)
+    x=re.sub(r'\*\*(.+?)\*\*',r'<strong>\1</strong>',x); x=re.sub(r'(?<![*\w])\*(?!\s)(.+?)\*(?!\*)',r'<em>\1</em>',x)
+    return x.replace(f'href="{SITE}/','href="/').replace(f'href="{SITE}"','href="/"')
+def md_html(md):
+    out=[]; lines=md.strip("\n").split("\n"); i=0
+    while i<len(lines):
+        l=lines[i]
+        if not l.strip(): i+=1; continue
+        if l.startswith("## "): out.append(f"<h2>{md_inline(l[3:])}</h2>"); i+=1; continue
+        if l.strip()=="---": out.append("<hr>"); i+=1; continue
+        for pat,tag in ((r"- ","ul"),(r"\d+\. ","ol")):
+            if re.match(pat,l):
+                items=[]
+                while i<len(lines) and re.match(pat,lines[i]): items.append(re.sub("^"+pat,"",lines[i])); i+=1
+                out.append(f"<{tag}>"+"".join(f"<li>{md_inline(x)}</li>" for x in items)+f"</{tag}>"); break
+        else:
+            if l.startswith("|"):
+                rows=[]
+                while i<len(lines) and lines[i].startswith("|"): rows.append([c.strip() for c in lines[i].strip("|").split("|")]); i+=1
+                head,body=rows[0],[r for r in rows[1:] if not set("".join(r))<=set("-: ")]
+                out.append('<div class="wrap"><table class="nosort"><thead><tr>'+"".join(f"<th>{md_inline(c)}</th>" for c in head)+"</tr></thead><tbody>"
+                           +"".join("<tr>"+"".join(f"<td>{md_inline(c)}</td>" for c in r)+"</tr>" for r in body)+"</tbody></table></div>")
+            else:
+                para=[]
+                while i<len(lines) and lines[i].strip() and not re.match(r"(## |- |\d+\. |\||---$)",lines[i]): para.append(lines[i]); i+=1
+                out.append(f"<p>{md_inline(' '.join(para))}</p>")
+    return "\n".join(out)
+g_md=open("free-builder-guide.md").read(); g_h1=re.match(r"# (.+)",g_md).group(1); g_md=g_md.split("\n",1)[1]
+G_CHECKED="2026-11-09"  # date the guide's figures were checked; bump when free-builder-guide.md is refreshed
+g_title=f"{g_h1} ({month(G_CHECKED)})"
+g_desc="A practical one-page guide to picking a free AI app builder or coding tool, with publish limits and £ prices. Checked 9 Nov 2026."
+g_pl={"@context":"https://schema.org","@type":"WebPage","name":g_title,"url":f"{SITE}/{GUIDE_SLUG}/","dateModified":G_CHECKED,"description":g_desc,
+      "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
+guide=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{E(g_title)}</title><meta name="description" content="{E(g_desc)}"><link rel="canonical" href="{SITE}/{GUIDE_SLUG}/">
+<meta property="og:title" content="{E(g_title)}"><meta property="og:description" content="{E(g_desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/{GUIDE_SLUG}/">{OG}
+{jsonld(g_pl)}
+{css}<style>.nosort th{{cursor:auto}}.nosort th:after{{content:none}}hr{{border:0;border-top:1px solid #ddd;margin:1.5rem 0}}</style></head><body>
+<header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(g_title)}</h1></header>
+<main><div class="box">
+{md_html(g_md)}
+</div>
+{news_box(NEWS_TOP)}</main>
+<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
+</body></html>
+'''
+os.makedirs(GUIDE_SLUG,exist_ok=True); open(f"{GUIDE_SLUG}/index.html","w").write(guide)
 # --- privacy page (operator, contact and services agreed with Caroline 1 Nov 2026)
 CONTACT="hello@freetierwatch.co.uk"
 pv_title="Privacy policy"
@@ -216,6 +277,6 @@ pv=f"""<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name=
 </body></html>
 """
 os.makedirs("privacy",exist_ok=True); open("privacy/index.html","w").write(pv)
-urls=[("/",checked),("/cheat-sheet/",checked),("/privacy/","2026-11-02"),(f"/{CMP_SLUG}/",cchk),(f"/{CODE_SLUG}/",code_chk)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
+urls=[("/",checked),("/cheat-sheet/",checked),("/privacy/","2026-11-02"),(f"/{CMP_SLUG}/",cchk),(f"/{CODE_SLUG}/",code_chk),(f"/{GUIDE_SLUG}/",G_CHECKED)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
 open("sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+"".join(f"<url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u,d in urls)+"</urlset>\n")
 print("\n".join(SITE+u for u,_ in urls))

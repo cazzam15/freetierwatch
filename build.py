@@ -40,14 +40,16 @@ faq=[("Which AI app builder has the best free plan?",
       f'{cheap["tool"]} has the lowest cheapest paid plan in our table: {cheap["paid_plan"]} at ${cheap["paid_usd"]} (about £{cheap["paid_gbp"]:.2f}) a month.'+(f' Note: {cheap["note"]}' if cheap["note"] else "")),
      ("Is Lovable free?",faqa("Lovable")),("Is Bolt.new free?",faqa("Bolt.new")),("Is Replit free?",faqa("Replit"))]
 CMP=["Lovable","Bolt.new","Replit"]; CMP_SLUG="lovable-vs-bolt-vs-replit"
+CODE=["Cursor","Windsurf","GitHub Copilot","Kiro","Google Antigravity"]; CODE_SLUG="free-ai-coding-tools"
+CODE_LINK=f'<p><a href="/{CODE_SLUG}/">Compare free AI coding tools: Cursor, Windsurf, GitHub Copilot, Kiro and Antigravity</a></p>'
 faqhtml=('<section id="faq"><h2>FAQ</h2>'+"".join(f'<h3>{E(q)}</h3><p>{E(a)}</p>' for q,a in faq)
-         +f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p></section>')
+         +f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p>'+CODE_LINK+'</section>')
 def jsonld(x): return '<script type="application/ld+json">'+json.dumps(x,ensure_ascii=False).replace("</","<\\/")+'</script>'
 def faqld(qa): return {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in qa]}
 def gbpa(t):
     p=f'{t["tool"]}\'s cheapest paid plan is {t["paid_plan"]} at ${t["paid_usd"]} (about £{t["paid_gbp"]:.2f}) a month'
-    # Google AI Studio's £ price is Google's own UK price, not a conversion
-    if t["tool"]=="Google AI Studio": return f'{p}. £{t["paid_gbp"]:.2f} is Google\'s own UK price, not a conversion. Checked {t["checked"]}.'
+    # Google's own UK prices (Google AI Studio, or any tool with "gbp_native": true) are not conversions
+    if t.get("gbp_native") or t["tool"]=="Google AI Studio": return f'{p}. £{t["paid_gbp"]:.2f} is Google\'s own UK price, not a conversion. Checked {t["checked"]}.'
     return f'{p}, converted at 1 USD = {FX["usd_gbp"]} GBP on {FX["date"]}. Checked {t["checked"]}.'
 ALPHA=sorted(T,key=lambda t:t["tool"].lower())
 def others(t,n=4):
@@ -91,7 +93,7 @@ for t in T:
     crumbs={"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
         {"@type":"ListItem","position":1,"name":"FreeTierWatch","item":SITE+"/"},
         {"@type":"ListItem","position":2,"name":t["tool"],"item":f"{SITE}/{s}/"}]}
-    cmp=f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p>' if t["tool"] in CMP else ""
+    cmp=f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p>' if t["tool"] in CMP else (CODE_LINK if t["tool"] in CODE else "")
     extra=(f'<section class="box"><h2>FAQ</h2>'+"".join(f'<h3>{E(q)}</h3><p>{E(a)}</p>' for q,a in tqa)+'</section>\n'
            '<section class="box"><h2>Other free plans to compare</h2><ul>'
            +"".join(f'<li><a href="/{slug(o["tool"])}/">{E(o["tool"])} free plan</a></li>' for o in others(t))+f'</ul>{cmp}</section>')
@@ -142,19 +144,20 @@ cs=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name=
 </body></html>
 '''
 os.makedirs("cheat-sheet",exist_ok=True); open("cheat-sheet/index.html","w").write(cs)
-# --- comparison page: Lovable vs Bolt vs Replit
-CT=[by[n] for n in CMP]; cchk=max(t["checked"] for t in CT)
-c_title=f"Lovable vs Bolt vs Replit free plans compared ({month(cchk)})"
-c_desc=f"Lovable, Bolt.new and Replit side by side: free plan, cheapest paid plan in £ and $, and official pricing sources. Checked {cchk}."
-c_qa=[(f"Is {n} free?",faqa(n)) for n in CMP]
-c_pl={"@context":"https://schema.org","@type":"WebPage","name":c_title,"url":f"{SITE}/{CMP_SLUG}/","dateModified":cchk,"description":c_desc,
-      "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
-c_rows="".join(f'<tr><td><a href="/{slug(t["tool"])}/">{E(t["tool"])}</a></td><td>{E(free_txt(t))}</td>'
-               f'<td>£{t["paid_gbp"]:.2f}<div class="note">${t["paid_usd"]}</div></td><td>{E(t["paid_plan"])}</td>'
-               f'<td>{E(t["checked"])}<div class="note"><a href="{E(t["source"])}" target="_blank" rel="noopener">official pricing</a></div></td></tr>' for t in CT)
-cmp_page=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{E(c_title)}</title><meta name="description" content="{E(c_desc)}"><link rel="canonical" href="{SITE}/{CMP_SLUG}/">
-<meta property="og:title" content="{E(c_title)}"><meta property="og:description" content="{E(c_desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/{CMP_SLUG}/">{OG}
+# --- comparison pages (same layout): make_cmp writes /<cslug>/ and returns its checked date
+def make_cmp(names,cslug,title_base,desc_base,extra_qa=()):
+    CT=[by[n] for n in names]; cchk=max(t["checked"] for t in CT)
+    c_title=f"{title_base} ({month(cchk)})"
+    c_desc=f"{desc_base} Checked {cchk}."
+    c_qa=[(q,a(CT,cchk) if callable(a) else a) for q,a in extra_qa]+[(f"Is {n} free?",faqa(n)) for n in names]
+    c_pl={"@context":"https://schema.org","@type":"WebPage","name":c_title,"url":f"{SITE}/{cslug}/","dateModified":cchk,"description":c_desc,
+          "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
+    c_rows="".join(f'<tr><td><a href="/{slug(t["tool"])}/">{E(t["tool"])}</a></td><td>{E(free_txt(t))}</td>'
+                   f'<td>£{t["paid_gbp"]:.2f}<div class="note">${t["paid_usd"]}</div></td><td>{E(t["paid_plan"])}</td>'
+                   f'<td>{E(t["checked"])}<div class="note"><a href="{E(t["source"])}" target="_blank" rel="noopener">official pricing</a></div></td></tr>' for t in CT)
+    cmp_page=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{E(c_title)}</title><meta name="description" content="{E(c_desc)}"><link rel="canonical" href="{SITE}/{cslug}/">
+<meta property="og:title" content="{E(c_title)}"><meta property="og:description" content="{E(c_desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/{cslug}/">{OG}
 {jsonld(c_pl)}{jsonld(faqld(c_qa))}
 {css}<style>.nosort th{{cursor:auto}}.nosort th:after{{content:none}}</style></head><body>
 <header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(c_title)}</h1></header>
@@ -171,7 +174,15 @@ cmp_page=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
 '''
-os.makedirs(CMP_SLUG,exist_ok=True); open(f"{CMP_SLUG}/index.html","w").write(cmp_page)
+    os.makedirs(cslug,exist_ok=True); open(f"{cslug}/index.html","w").write(cmp_page); return cchk
+cchk=make_cmp(CMP,CMP_SLUG,"Lovable vs Bolt vs Replit free plans compared",
+    "Lovable, Bolt.new and Replit side by side: free plan, cheapest paid plan in £ and $, and official pricing sources.")
+def code_cheapest(CT,cchk):
+    t=min(CT,key=lambda t:t["paid_usd"])
+    return f'Of these, {t["tool"]} has the cheapest paid plan: {t["paid_plan"]} at ${t["paid_usd"]} (about £{t["paid_gbp"]:.2f}) a month. Checked {t["checked"]}.'
+code_chk=make_cmp(CODE,CODE_SLUG,"Free AI coding tools compared: Cursor, Windsurf, GitHub Copilot, Kiro and Antigravity",
+    "Free plans of AI coding apps side by side: Cursor, Windsurf, GitHub Copilot, Kiro and Google Antigravity, with the cheapest paid plan in £ and $ and official pricing sources.",
+    [("Which free AI coding tool is cheapest to upgrade?",code_cheapest)])
 # --- privacy page (operator, contact and services agreed with Caroline 1 Nov 2026)
 CONTACT="hello@freetierwatch.co.uk"
 pv_title="Privacy policy"
@@ -205,6 +216,6 @@ pv=f"""<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name=
 </body></html>
 """
 os.makedirs("privacy",exist_ok=True); open("privacy/index.html","w").write(pv)
-urls=[("/",checked),("/cheat-sheet/",checked),("/privacy/","2026-11-02"),(f"/{CMP_SLUG}/",cchk)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
+urls=[("/",checked),("/cheat-sheet/",checked),("/privacy/","2026-11-02"),(f"/{CMP_SLUG}/",cchk),(f"/{CODE_SLUG}/",code_chk)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
 open("sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+"".join(f"<url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u,d in urls)+"</urlset>\n")
 print("\n".join(SITE+u for u,_ in urls))

@@ -49,9 +49,11 @@ faq=[("Which AI app builder has the best free plan?",
      ("Is Lovable free?",faqa("Lovable")),("Is Bolt.new free?",faqa("Bolt.new")),("Is Replit free?",faqa("Replit"))]
 CMP=["Lovable","Bolt.new","Replit"]; CMP_SLUG="lovable-vs-bolt-vs-replit"
 CODE=["Cursor","Windsurf","GitHub Copilot","Kiro","Google Antigravity"]; CODE_SLUG="free-ai-coding-tools"
+FB_SLUG="firebase-studio-alternatives"
+FB_LINK=f'<p><a href="/{FB_SLUG}/">Firebase Studio is closing: free alternatives compared</a></p>'
 CODE_LINK=f'<p><a href="/{CODE_SLUG}/">Compare free AI coding tools: Cursor, Windsurf, GitHub Copilot, Kiro and Antigravity</a></p>'
 faqhtml=('<section id="faq"><h2>FAQ</h2>'+"".join(f'<h3>{E(q)}</h3><p>{E(a)}</p>' for q,a in faq)
-         +f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p>'+CODE_LINK+f'<p><a href="/{GUIDE_SLUG}/">Free guide: which free AI app builder should I pick?</a></p></section>')
+         +f'<p><a href="/{CMP_SLUG}/">Compare Lovable, Bolt and Replit side by side</a></p>'+CODE_LINK+FB_LINK+f'<p><a href="/{GUIDE_SLUG}/">Free guide: which free AI app builder should I pick?</a></p></section>')
 def jsonld(x): return '<script type="application/ld+json">'+json.dumps(x,ensure_ascii=False).replace("</","<\\/")+'</script>'
 def faqld(qa): return {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in qa]}
 def gbpa(t):
@@ -191,6 +193,47 @@ def code_cheapest(CT,cchk):
 code_chk=make_cmp(CODE,CODE_SLUG,"Free AI coding tools compared: Cursor, Windsurf, GitHub Copilot, Kiro and Antigravity",
     "Free plans of AI coding apps side by side: Cursor, Windsurf, GitHub Copilot, Kiro and Google Antigravity, with the cheapest paid plan in £ and $ and official pricing sources.",
     [("Which free AI coding tool is cheapest to upgrade?",code_cheapest)])
+# --- /firebase-studio-alternatives/ (Firebase Studio sunset; facts from FB_SRC, checked 16 Nov 2026)
+FB_SRC="https://firebase.google.com/docs/studio/get-started"
+FB=[("Google AI Studio","Google's suggested move for web-based, prompt-based prototyping."),
+    ("Google Antigravity","Google's suggested move for local, code-first work with agents."),
+    ("Bolt.new","Build a web app from a prompt in the browser."),
+    ("Lovable","Build a web app from a prompt in the browser."),
+    ("Replit","Browser workspace with an AI agent, if you liked coding in the cloud."),
+    ("Cursor","AI code editor on your own computer."),
+    ("GitHub Copilot","AI help inside the editor you already use."),
+    ("Kiro","AWS's AI coding app (IDE).")]
+FT=[by[n] for n,_ in FB]; fbchk=max(t["checked"] for t in FT)
+fb_title=f"Firebase Studio is closing: free alternatives ({month(fbchk)})"
+fb_desc=f"Firebase Studio shuts on 22 March 2027. Free plans of 8 alternatives, including Google AI Studio and Antigravity, with the cheapest paid plan in £. Checked {fbchk}."
+fb_qa=[("When does Firebase Studio close?","Google says Firebase Studio is sunsetting on 22 March 2027. New workspace creation and sign-ups have been disabled since 22 June 2026. Existing workspaces keep working until the sunset date."),
+       ("What happens to apps I already deployed?","Google says apps already deployed to Firebase keep running after the sunset date, and core Firebase products such as Firestore, Authentication and App Hosting are not affected."),
+       ("Where does Google suggest moving?","Google suggests Google AI Studio for web-based, prompt-based prototyping, or Google Antigravity for a local, code-first setup.")]+[(f"Is {n} free?",faqa(n)) for n,_ in FB]
+fb_pl={"@context":"https://schema.org","@type":"WebPage","name":fb_title,"url":f"{SITE}/{FB_SLUG}/","dateModified":fbchk,"description":fb_desc,
+       "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
+fb_rows="".join(f'<tr><td><a href="/{slug(t["tool"])}/">{E(t["tool"])}</a></td><td>{E(free_txt(t))}</td>'
+                f'<td>£{t["paid_gbp"]:.2f}<div class="note">{E(t["paid_plan"])}</div></td><td>{E(w)}</td>'
+                f'<td>{E(t["checked"])}<div class="note"><a href="{E(t["source"])}" target="_blank" rel="noopener">official pricing</a></div></td></tr>' for t,(n,w) in zip(FT,FB))
+fb_page=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{E(fb_title)}</title><meta name="description" content="{E(fb_desc)}"><link rel="canonical" href="{SITE}/{FB_SLUG}/">
+<meta property="og:title" content="{E(fb_title)}"><meta property="og:description" content="{E(fb_desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/{FB_SLUG}/">{OG}
+{jsonld(fb_pl)}{jsonld(faqld(fb_qa))}
+{css}<style>.nosort th{{cursor:auto}}.nosort th:after{{content:none}}</style></head><body>
+<header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(fb_title)}</h1></header>
+<main><div class="box">
+<p>Google is closing Firebase Studio. It shuts on <strong>22 March 2027</strong>, and since 22 June 2026 nobody can sign up or create a new workspace. If you already have workspaces, you can keep working in them until the sunset date. Apps you already deployed to Firebase keep running, and Firestore, Authentication and App Hosting are not affected. Source: <a href="{FB_SRC}" target="_blank" rel="noopener">Google's Firebase Studio docs</a>.</p>
+<p>Google points people to Google AI Studio or Google Antigravity. Below are those two plus six other tools with a free plan, from our tracker.</p>
+<div class="wrap"><table class="nosort"><thead><tr><th>Tool</th><th>Free plan</th><th>Cheapest paid</th><th>Who it suits</th><th>Last checked</th></tr></thead><tbody>{fb_rows}</tbody></table></div>
+<p class="note">£ prices converted at 1 USD = {FX["usd_gbp"]} GBP ({E(FX["date"])}), except Google's own UK prices (Google AI Studio and Antigravity). Prices exclude VAT unless stated and change often, so check before you pay. <a href="/">Compare all tools in the table</a> · <a href="/{CODE_SLUG}/">Compare free AI coding tools</a></p>
+</div>
+{SIGNUP}
+<section class="box"><h2>FAQ</h2>{"".join(f"<h3>{E(q)}</h3><p>{E(a)}</p>" for q,a in fb_qa)}</section>
+{NEWS_BOX}</main>
+<footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed, or with Google or Firebase.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
+</body></html>
+'''
+os.makedirs(FB_SLUG,exist_ok=True); open(f"{FB_SLUG}/index.html","w").write(fb_page)
 # --- free guide page: /free-builder-guide/ from free-builder-guide.md (small markdown subset: #/## headings,
 # paragraphs, - and 1. lists, | tables, ---, **bold**, *italic*, [text](url), bare https:// links)
 def md_inline(x):
@@ -224,9 +267,9 @@ def md_html(md):
                 out.append(f"<p>{md_inline(' '.join(para))}</p>")
     return "\n".join(out)
 g_md=open("free-builder-guide.md").read(); g_h1=re.match(r"# (.+)",g_md).group(1); g_md=g_md.split("\n",1)[1]
-G_CHECKED="2026-11-09"  # date the guide's figures were checked; bump when free-builder-guide.md is refreshed
+G_CHECKED="2026-11-16"  # date the guide's figures were checked; bump when free-builder-guide.md is refreshed
 g_title=f"{g_h1} ({month(G_CHECKED)})"
-g_desc="A practical one-page guide to picking a free AI app builder or coding tool, with publish limits and £ prices. Checked 9 Nov 2026."
+g_desc="A practical one-page guide to picking a free AI app builder or coding tool, with publish limits and £ prices. Checked 16 Nov 2026."
 g_pl={"@context":"https://schema.org","@type":"WebPage","name":g_title,"url":f"{SITE}/{GUIDE_SLUG}/","dateModified":G_CHECKED,"description":g_desc,
       "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
 guide=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -277,6 +320,6 @@ pv=f"""<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name=
 </body></html>
 """
 os.makedirs("privacy",exist_ok=True); open("privacy/index.html","w").write(pv)
-urls=[("/",checked),("/cheat-sheet/",checked),("/privacy/","2026-11-02"),(f"/{CMP_SLUG}/",cchk),(f"/{CODE_SLUG}/",code_chk),(f"/{GUIDE_SLUG}/",G_CHECKED)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
+urls=[("/",checked),("/cheat-sheet/",checked),("/privacy/","2026-11-02"),(f"/{CMP_SLUG}/",cchk),(f"/{CODE_SLUG}/",code_chk),(f"/{FB_SLUG}/",fbchk),(f"/{GUIDE_SLUG}/",G_CHECKED)]+[(f"/{slug(t['tool'])}/",t["checked"]) for t in T]
 open("sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+"".join(f"<url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u,d in urls)+"</urlset>\n")
 print("\n".join(SITE+u for u,_ in urls))

@@ -14,14 +14,14 @@ SLACK_TEXT="Join the free FreeTierWatch Slack community"
 SLACK_P=f'<!--slack--><p class="slack"><a href="{SLACK_URL}" target="_blank" rel="noopener">{SLACK_TEXT}</a></p><!--/slack-->'
 SLACK_SPAN=f'<!--slack--><span class="slack"><a href="{SLACK_URL}" target="_blank" rel="noopener">{SLACK_TEXT}</a></span><!--/slack-->'
 BEEHIIV='<script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="9023118a-54b2-4146-827a-5ed26d0013e0"></script>'
-PROMISE='<!--promise--><p class="promise"><strong>Free:</strong> subscribe for price-change alerts when a free plan or price changes, plus the one-page <a href="/cheat-sheet/">AI App Builder Free Plans Cheat Sheet (PDF)</a>.</p><!--/promise-->'
 # Newsletter signup copy (one wording everywhere). SIGNUP = compact box after the main table/summary;
-# NEWS_BOX = the Newsletter section near the footer (adds the cheat-sheet line and the Slack link).
+# NEWS_BOX = the Newsletter section near the footer (adds the Slack link). DL = the download link under the form.
 GUIDE_SLUG="free-builder-guide"
-NEWS_TOP='<h2>Get an email when a free plan changes</h2><p>One short email every Monday. Free, unsubscribe any time.</p>'
-NEWS_HEAD=NEWS_TOP+f'<p class="note">Plus our free guide: <a href="/{GUIDE_SLUG}/">which AI builder to pick</a></p>'
-SIGNUP=f'<!--signup--><section class="box signup">{NEWS_HEAD}\n{BEEHIIV}</section><!--/signup-->'
-def news_box(head=None): return f'<section class="box">{head or NEWS_HEAD}\n{PROMISE}\n{BEEHIIV}\n{SLACK_P}</section>'
+CS_PDF="/downloads/free-plan-cheat-sheet.pdf"  # the cheat sheet; /cheatsheet.pdf holds the same bytes for old links
+NEWS_TOP='<h2>Get the free plan cheat sheet + weekly free-plan changes</h2><p>A 2-page PDF of what 18 AI app builders give you free, plus one short email every Monday when a free plan or price changes. Free, unsubscribe any time.</p>'
+DL=f'<!--dl--><p class="note"><a href="{CS_PDF}">Already subscribed? Download the cheat sheet (PDF)</a></p><!--/dl-->'
+SIGNUP=f'<!--signup--><section class="box signup">{NEWS_TOP}\n{BEEHIIV}\n{DL}</section><!--/signup-->'
+def news_box(head=None): return f'<section class="box">{head or NEWS_TOP}\n{BEEHIIV}\n{DL}\n{SLACK_P}</section>'
 NEWS_BOX=news_box()
 def free_txt(t): return "Unclear (not shown on the pricing page when checked)" if t["free"]=="unclear" else t["free"]
 def row(t):
@@ -84,17 +84,19 @@ h=between(h,"<tbody>","</tbody>",rows)
 h=re.sub(r'<!--slack--><p class="slack">.*?<!--/slack-->',lambda m:SLACK_P,h,flags=re.S)
 h=re.sub(r'<!--slack--><span class="slack">.*?<!--/slack-->',lambda m:SLACK_SPAN,h,flags=re.S)
 h=between(h,'<p class="note" id="fx">',"</p>",fxline)
-h=re.sub(r'<!--signup-->.*?<!--/signup-->\n?','',h,flags=re.S)
-h=h.replace('<p class="note" id="fx">'+fxline+'</p>\n','<p class="note" id="fx">'+fxline+'</p>\n'+SIGNUP+'\n',1)
+h=re.sub(r'<!--signup-->.*?<!--/signup-->\n?','',h,flags=re.S); h=re.sub(r'<!--cslink-->.*?<!--/cslink-->\n?','',h,flags=re.S)
+CS_LINK='<!--cslink--><p class="note"><a href="/cheat-sheet/"><strong>Free PDF: the Free Plan Cheat Sheet</strong></a></p><!--/cslink-->'
+h=h.replace('<p class="note" id="fx">'+fxline+'</p>\n','<p class="note" id="fx">'+fxline+'</p>\n'+CS_LINK+'\n'+SIGNUP+'\n',1)
 h=re.sub(r'<section class="box">(<h2>Newsletter</h2><p>Get a weekly email when a free plan changes.</p>|<!--newshead-->.*?<!--/newshead-->)',
-         lambda m:'<section class="box"><!--newshead-->'+NEWS_HEAD+'<!--/newshead-->',h,count=1,flags=re.S)
+         lambda m:'<section class="box"><!--newshead-->'+NEWS_TOP+'<!--/newshead-->',h,count=1,flags=re.S)
 h=between(h,'<ul id="log">',"</ul>",log)
 h=re.sub(r'<section id="faq">.*?</section>\n?','',h,flags=re.S)
 h=h.replace('<section><h2>About</h2>',faqhtml+'\n<section><h2>About</h2>',1)
 h=h.replace('<a href="${esc(t.url)}" rel="nofollow noopener" target="_blank">${esc(t.tool)}</a></td>',
             '<a href="${esc(t.url)}" rel="nofollow noopener" target="_blank">${esc(t.tool)}</a><div class="note"><a href="/${t.tool.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}/">${esc(t.tool)} free plan details</a></div></td>')
-h=re.sub(r'<!--promise-->.*?<!--/promise-->\n?','',h,flags=re.S)
-h=h.replace("<!--/newshead-->\n","<!--/newshead-->\n"+PROMISE+"\n",1)
+h=re.sub(r'<!--promise-->.*?<!--/promise-->\n?','',h,flags=re.S); h=re.sub(r'\n?<!--dl-->.*?<!--/dl-->','',h,flags=re.S)
+h=h.replace(SIGNUP.replace('\n'+DL,''),SIGNUP,1)  # compact box (DL stripped above)
+h=h.replace("<!--/newshead-->\n"+BEEHIIV,"<!--/newshead-->\n"+BEEHIIV+"\n"+DL,1)
 open("index.html","w").write(h)
 css=re.search(r"<style>.*?</style>",h,re.S).group(0)
 # --- tool pages
@@ -135,22 +137,26 @@ for t in T:
 </body></html>
 '''
     os.makedirs(s,exist_ok=True); open(f"{s}/index.html","w").write(page)
-cs_title="AI App Builder Free Plans Cheat Sheet (Oct 2026)"
-CS_TOOLS=12  # tools in cheatsheet.pdf; bump when the PDF is regenerated
-cs_desc=f"Free one-page PDF: free plans and cheapest paid prices in £ for {CS_TOOLS} AI app builders, checked {checked}."
+cs_title="The Free Plan Cheat Sheet: AI app builders (Nov 2026)"
+CS_CHECKED="16 Nov 2026"  # date the PDF's figures were checked; update with the PDF
+CS_IMG_W,CS_IMG_H=662,936  # size of cheat-sheet/page-1.png (pdftoppm -r 80 -png -f 1 -l 1 -singlefile)
+cs_desc=f"Free 2-page PDF: what 18 AI app builders and coding tools give you free, the cheapest paid plan in £, best picks and the gotchas. Checked {CS_CHECKED}."
 cs=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(cs_title)}</title><meta name="description" content="{E(cs_desc)}"><link rel="canonical" href="{SITE}/cheat-sheet/">
 <meta property="og:title" content="{E(cs_title)}"><meta property="og:description" content="{E(cs_desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/cheat-sheet/">{OG}
 {css}</head><body>
 <header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(cs_title)}</h1></header>
 <main><div class="box">
-<p>{E(cs_desc)} Every figure comes from our <a href="/">live table</a>, with sources linked there.</p>
-<p><a href="/cheatsheet.pdf" download><strong>Download the cheat sheet (PDF)</strong></a></p>
-<p class="note">Prices change often, so check the official pricing page before you pay.</p>
+<p>A free 2-page PDF covering 18 AI app builders and coding tools: each tool's free plan in one line, the cheapest paid plan in £, and the best pick for what you want to build.</p>
+<p>It also lists the gotchas: credit caps, branding on free apps, apps you can't put live on a free plan, and Firebase Studio closing on 22 March 2027.</p>
+<p class="note">Checked {CS_CHECKED} against each tool's official pricing page. Every figure is also in our <a href="/">live table</a>, with sources linked there.</p>
 </div>
-<section class="box"><h2>Get price-change alerts</h2><p>Subscribe free and we'll email you when a free plan or price changes, plus an updated cheat sheet.</p>
+<section class="box"><h2>Get the cheat sheet + weekly free-plan changes</h2>
 {BEEHIIV}
-{SLACK_P}</section></main>
+<p><a href="{CS_PDF}"><strong>Subscribed? Download the cheat sheet (PDF)</strong></a></p>
+<p class="note">Prices change often, so check the official pricing page before you pay.</p>
+{SLACK_P}</section>
+<div class="box"><p><img src="/cheat-sheet/page-1.png" alt="Page 1 of the Free Plan Cheat Sheet" width="{CS_IMG_W}" height="{CS_IMG_H}" loading="lazy" style="max-width:100%;height:auto;border:1px solid #ddd"></p></div></main>
 <footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
@@ -281,7 +287,7 @@ guide=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta na
 <main><div class="box">
 {md_html(g_md)}
 </div>
-{news_box(NEWS_TOP)}</main>
+{NEWS_BOX}</main>
 <footer class="note"><a href="/">FreeTierWatch</a> is independent and not affiliated with any tool listed.<br>{SLACK_SPAN}<br>Made by Caro at <a href="https://www.instagram.com/ainofluff/" target="_blank" rel="noopener">Ainofluff</a><br>© 2026 FreeTierWatch · <a href="/privacy/">Privacy</a></footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "f608d8c7c07c493081b69d69a6787c76"}}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>

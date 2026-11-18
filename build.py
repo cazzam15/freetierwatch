@@ -24,6 +24,20 @@ SIGNUP=f'<!--signup--><section class="box signup">{NEWS_TOP}\n{BEEHIIV}\n{DL}</s
 def news_box(head=None): return f'<section class="box">{head or NEWS_TOP}\n{BEEHIIV}\n{DL}\n{SLACK_P}</section>'
 NEWS_BOX=news_box()
 def free_txt(t): return "Unclear (not shown on the pricing page when checked)" if t["free"]=="unclear" else t["free"]
+# Meta description <= 160 chars (search engines cut longer ones). Use the full line if it fits,
+# else the first part of the free plan and the paid plan name, else just the paid plan.
+def tool_desc(t):
+    full=f'{t["tool"]} free plan: {free_txt(t)}. Cheapest paid: {t["paid_plan"]}, ${t["paid_usd"]} (about £{t["paid_gbp"]:.2f})/month. Checked {t["checked"]}.'
+    if len(full)<=160: return full
+    plan=re.split(r",| \(",t["paid_plan"])[0]
+    parts=[s.strip() for s in re.split(r";|, (?![^(]*\))",free_txt(t).rstrip("."))]
+    best=f'{t["tool"]} free plan explained, plus the cheapest paid plan ({plan}, about £{t["paid_gbp"]:.2f}/month). Checked {t["checked"]}.'
+    for n in range(1,len(parts)+1):
+        free=", ".join(parts[:n])
+        for paid in (f'{plan}, about £{t["paid_gbp"]:.2f}/month', f'{plan}, ${t["paid_usd"]} (about £{t["paid_gbp"]:.2f})/month'):
+            d=f'{t["tool"]} free plan: {free}. Cheapest paid: {paid}. Checked {t["checked"]}.'
+            if len(d)<=160 and len(d)>len(best): best=d
+    return best
 def row(t):
     f='<span class="unclear">Unclear</span>' if t["free"]=="unclear" else E(t["free"])
     n=f'<div class="note">{E(t["note"])}</div>' if t["note"] else ""
@@ -102,7 +116,7 @@ css=re.search(r"<style>.*?</style>",h,re.S).group(0)
 # --- tool pages
 for t in T:
     s=slug(t["tool"]); title=f'{t["tool"]} free plan & price in £ ({month(t["checked"])})'
-    desc=f'{t["tool"]} free plan: {free_txt(t)}. Cheapest paid: {t["paid_plan"]}, ${t["paid_usd"]} (about £{t["paid_gbp"]:.2f})/month. Checked {t["checked"]}.'
+    desc=tool_desc(t)
     pl={"@context":"https://schema.org","@type":"WebPage","name":title,"url":f"{SITE}/{s}/","dateModified":t["checked"],"description":desc,
         "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
     tqa=[(f'Is {t["tool"]} free?',faqa(t["tool"])),(f'How much is {t["tool"]} in pounds?',gbpa(t))]
@@ -163,9 +177,10 @@ cs=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name=
 '''
 os.makedirs("cheat-sheet",exist_ok=True); open("cheat-sheet/index.html","w").write(cs)
 # --- comparison pages (same layout): make_cmp writes /<cslug>/ and returns its checked date
-def make_cmp(names,cslug,title_base,desc_base,extra_qa=()):
+def make_cmp(names,cslug,title_base,desc_base,extra_qa=(),h1_base=None):
     CT=[by[n] for n in names]; cchk=max(t["checked"] for t in CT)
     c_title=f"{title_base} ({month(cchk)})"
+    c_h1=f"{h1_base or title_base} ({month(cchk)})"
     c_desc=f"{desc_base} Checked {cchk}."
     c_qa=[(q,a(CT,cchk) if callable(a) else a) for q,a in extra_qa]+[(f"Is {n} free?",faqa(n)) for n in names]
     c_pl={"@context":"https://schema.org","@type":"WebPage","name":c_title,"url":f"{SITE}/{cslug}/","dateModified":cchk,"description":c_desc,
@@ -178,7 +193,7 @@ def make_cmp(names,cslug,title_base,desc_base,extra_qa=()):
 <meta property="og:title" content="{E(c_title)}"><meta property="og:description" content="{E(c_desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{SITE}/{cslug}/">{OG}
 {jsonld(c_pl)}{jsonld(faqld(c_qa))}
 {css}<style>.nosort th{{cursor:auto}}.nosort th:after{{content:none}}</style></head><body>
-<header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(c_title)}</h1></header>
+<header><p class="note"><a href="/">← All AI app builder free plans</a></p><h1>{E(c_h1)}</h1></header>
 <main><div class="box">
 <div class="wrap"><table class="nosort"><thead><tr><th>Tool</th><th>Free plan</th><th>Cheapest paid</th><th>Plan</th><th>Last checked</th></tr></thead><tbody>{c_rows}</tbody></table></div>
 <p class="note">£ prices converted at 1 USD = {FX["usd_gbp"]} GBP ({E(FX["date"])}). Prices exclude VAT unless stated and change often, so check before you pay. <a href="/">Compare all tools in the table</a></p>
@@ -196,9 +211,10 @@ cchk=make_cmp(CMP,CMP_SLUG,"Lovable vs Bolt vs Replit free plans compared",
 def code_cheapest(CT,cchk):
     t=min(CT,key=lambda t:t["paid_usd"])
     return f'Of these, {t["tool"]} has the cheapest paid plan: {t["paid_plan"]} at ${t["paid_usd"]} (about £{t["paid_gbp"]:.2f}) a month. Checked {t["checked"]}.'
-code_chk=make_cmp(CODE,CODE_SLUG,"Free AI coding tools compared: Cursor, Windsurf, GitHub Copilot, Kiro and Antigravity",
-    "Free plans of AI coding apps side by side: Cursor, Windsurf, GitHub Copilot, Kiro and Google Antigravity, with the cheapest paid plan in £ and $ and official pricing sources.",
-    [("Which free AI coding tool is cheapest to upgrade?",code_cheapest)])
+code_chk=make_cmp(CODE,CODE_SLUG,"Free AI coding tools: Cursor, Windsurf, Copilot",
+    "Free plans of 5 AI coding tools side by side (Cursor, Windsurf, GitHub Copilot, Kiro, Antigravity), with the cheapest paid plan in £ and $.",
+    [("Which free AI coding tool is cheapest to upgrade?",code_cheapest)],
+    h1_base="Free AI coding tools compared: Cursor, Windsurf, GitHub Copilot, Kiro and Antigravity")
 # --- /firebase-studio-alternatives/ (Firebase Studio sunset; facts from FB_SRC, checked 16 Nov 2026)
 FB_SRC="https://firebase.google.com/docs/studio/get-started"
 FB=[("Google AI Studio","Google's suggested move for web-based, prompt-based prototyping."),
@@ -211,7 +227,7 @@ FB=[("Google AI Studio","Google's suggested move for web-based, prompt-based pro
     ("Kiro","AWS's AI coding app (IDE).")]
 FT=[by[n] for n,_ in FB]; fbchk=max(t["checked"] for t in FT)
 fb_title=f"Firebase Studio is closing: free alternatives ({month(fbchk)})"
-fb_desc=f"Firebase Studio shuts on 22 March 2027. Free plans of 8 alternatives, including Google AI Studio and Antigravity, with the cheapest paid plan in £. Checked {fbchk}."
+fb_desc=f"Firebase Studio closes on 22 March 2027. Compare 8 free alternatives, including Google AI Studio and Antigravity, with paid prices in £. Checked {fbchk}."
 fb_qa=[("When does Firebase Studio close?","Google says Firebase Studio is sunsetting on 22 March 2027. New workspace creation and sign-ups have been disabled since 22 June 2026. Existing workspaces keep working until the sunset date."),
        ("What happens to apps I already deployed?","Google says apps already deployed to Firebase keep running after the sunset date, and core Firebase products such as Firestore, Authentication and App Hosting are not affected."),
        ("Where does Google suggest moving?","Google suggests Google AI Studio for web-based, prompt-based prototyping, or Google Antigravity for a local, code-first setup.")]+[(f"Is {n} free?",faqa(n)) for n,_ in FB]
@@ -296,7 +312,7 @@ os.makedirs(GUIDE_SLUG,exist_ok=True); open(f"{GUIDE_SLUG}/index.html","w").writ
 # --- privacy page (operator, contact and services agreed with Caroline 1 Nov 2026)
 CONTACT="hello@freetierwatch.co.uk"
 pv_title="Privacy policy"
-pv_desc="What personal data FreeTierWatch collects, why, who handles it and how to contact us."
+pv_desc="What personal data FreeTierWatch collects when you visit or subscribe, why it collects it, who handles it and how to contact us about it."
 pv_body=f"""<p class="note">Last updated 2 November 2026</p>
 <p>This explains what personal data freetierwatch.co.uk collects and how it's used. The site has no accounts and no adverts, and it doesn't set any cookies of its own, so it collects very little.</p>
 <h2>Who's responsible</h2>

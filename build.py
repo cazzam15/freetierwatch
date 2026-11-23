@@ -113,13 +113,31 @@ h=h.replace(SIGNUP.replace('\n'+DL,''),SIGNUP,1)  # compact box (DL stripped abo
 h=h.replace("<!--/newshead-->\n"+BEEHIIV,"<!--/newshead-->\n"+BEEHIIV+"\n"+DL,1)
 open("index.html","w").write(h)
 css=re.search(r"<style>.*?</style>",h,re.S).group(0)
+# Optional extra content for single tool pages (title/desc override, extra HTML under the main box, extra FAQs).
+# Other tool pages are unchanged. Antigravity facts from antigravity.google/pricing and Google's UK plans page, checked 23 Nov 2026.
+AG_SRC="https://antigravity.google/pricing"; GOO_UK="https://one.google.com/intl/en_gb/about/google-ai-plans/"
+TOOL_EXTRA={"Google Antigravity":{
+ "title":"Google Antigravity pricing in £ (Nov 2026): is it free?",
+ "desc":"Is Google Antigravity free? What the free Individual plan includes, and what Google AI Pro (£18.99) and Ultra (from £79.99) add. Checked 23 Nov 2026.",
+ "html":(f'<section class="box"><h2>Antigravity plans</h2>'
+  '<style>.nosort th{cursor:auto}.nosort th:after{content:none}</style><div class="wrap"><table class="nosort"><thead><tr><th>Plan</th><th>UK price</th><th>What you get in Antigravity</th></tr></thead><tbody>'
+  '<tr><td>Individual (free)</td><td>£0</td><td>App, CLI and IDE extensions; parallel background agents, subagents, browser use and scheduled tasks; baseline agent quota refreshed weekly; Gemini 3.8 Flash (Claude Sonnet 4.6, Opus 4.6 and GPT-OSS-120b until 30 Nov 2026)</td></tr>'
+  '<tr><td>Google AI Pro</td><td>£18.99/month</td><td>Generous agent quota refreshed every 5 hours and higher weekly limits; /boost deep reasoning, multi-agent teamwork, Remote Control; Gemini 4 models and Claude Sonnet/Opus 5.5; optional AI credit overages</td></tr>'
+  '<tr><td>Google AI Ultra</td><td>from £79.99/month (Ultra 20x £189.99)</td><td>Highest agent quota refreshed every 5 hours; Gemini 4 Carbon; full access to third-party partner models and AI credit overages</td></tr>'
+  '</tbody></table></div>'
+  f'<p class="note">Sources: <a href="{AG_SRC}" target="_blank" rel="noopener">Antigravity pricing</a> (what each plan includes) and <a href="{GOO_UK}" target="_blank" rel="noopener">Google AI plans (UK)</a> (UK prices). Checked 23 Nov 2026.</p>'
+  '<p>There is no separate Antigravity subscription. The free Individual plan is the starting point, and higher limits come with a Google AI plan: Google AI Pro at £18.99/month or Google AI Ultra from £79.99/month in the UK. Google\'s pricing page says Google AI Pro and Ultra plans require a personal Google Account, so Workspace work accounts can\'t use them; work accounts can pay as you go through Google Cloud or use Gemini Enterprise instead.</p>'
+  f'<p><a href="/{CODE_SLUG}/">Compare free AI coding tools</a> · <a href="/{FB_SLUG}/">Firebase Studio is closing: free alternatives</a></p></section>'),
+ "qa":[("What do you lose on the free plan on 30 November 2026?","Google's Antigravity pricing page says Claude Sonnet 4.6, Claude Opus 4.6 and GPT-OSS-120b will be removed from the free Individual plan on 30 November 2026. Gemini 3.8 Flash stays listed. Checked 23 Nov 2026."),
+       ("Is there a separate Antigravity subscription?","No. Higher Antigravity limits come with a Google AI plan: Google AI Pro (£18.99/month in the UK) or Google AI Ultra (from £79.99/month in the UK)."),
+       ("Can I use Antigravity Pro with a work Google account?","No. Google says Google AI Pro and Ultra plans require a personal Google Account, so Workspace work accounts can't use them. Work accounts can pay as you go through Google Cloud or use Gemini Enterprise instead.")]}}
 # --- tool pages
 for t in T:
-    s=slug(t["tool"]); title=f'{t["tool"]} free plan & price in £ ({month(t["checked"])})'
-    desc=tool_desc(t)
+    s=slug(t["tool"]); X=TOOL_EXTRA.get(t["tool"],{}); title=X.get("title") or f'{t["tool"]} free plan & price in £ ({month(t["checked"])})'
+    desc=X.get("desc") or tool_desc(t)
     pl={"@context":"https://schema.org","@type":"WebPage","name":title,"url":f"{SITE}/{s}/","dateModified":t["checked"],"description":desc,
         "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
-    tqa=[(f'Is {t["tool"]} free?',faqa(t["tool"])),(f'How much is {t["tool"]} in pounds?',gbpa(t))]
+    tqa=[(f'Is {t["tool"]} free?',faqa(t["tool"])),(f'How much is {t["tool"]} in pounds?',gbpa(t))]+X.get("qa",[])
     crumbs={"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
         {"@type":"ListItem","position":1,"name":"FreeTierWatch","item":SITE+"/"},
         {"@type":"ListItem","position":2,"name":t["tool"],"item":f"{SITE}/{s}/"}]}
@@ -143,6 +161,7 @@ for t in T:
 <p class="note">Last checked: {E(t["checked"])}. Converted at 1 USD = {FX["usd_gbp"]} GBP ({E(FX["date"])}). Prices change often, so check before you pay.</p>
 <p><a href="{E(t["source"])}" target="_blank" rel="noopener">Official {E(t["tool"])} pricing page</a> · <a href="/">Compare all tools in the table</a></p>{aff}
 </div>
+{X.get("html","")}
 {SIGNUP}
 {extra}
 {NEWS_BOX}</main>
@@ -289,9 +308,9 @@ def md_html(md):
                 out.append(f"<p>{md_inline(' '.join(para))}</p>")
     return "\n".join(out)
 g_md=open("free-builder-guide.md").read(); g_h1=re.match(r"# (.+)",g_md).group(1); g_md=g_md.split("\n",1)[1]
-G_CHECKED="2026-11-16"  # date the guide's figures were checked; bump when free-builder-guide.md is refreshed
+G_CHECKED="2026-11-23"  # date the guide's figures were checked; bump when free-builder-guide.md is refreshed
 g_title=f"{g_h1} ({month(G_CHECKED)})"
-g_desc="A practical one-page guide to picking a free AI app builder or coding tool, with publish limits and £ prices. Checked 16 Nov 2026."
+g_desc="A practical one-page guide to picking a free AI app builder or coding tool, with publish limits and £ prices. Checked 23 Nov 2026."
 g_pl={"@context":"https://schema.org","@type":"WebPage","name":g_title,"url":f"{SITE}/{GUIDE_SLUG}/","dateModified":G_CHECKED,"description":g_desc,
       "isPartOf":{"@type":"WebSite","name":"FreeTierWatch","url":SITE+"/"}}
 guide=f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
